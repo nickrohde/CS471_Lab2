@@ -1,0 +1,174 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+%\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage[margin=0.25in]{geometry}
+\usepackage{sectsty} % Allows customizing section commands
+\usepackage{rotating} % for long tables
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+\usepackage{tabularx,ragged2e,booktabs,caption}
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{Central Washington University, Department of Computer Science} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge CS471 Project 1 \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Nick Rohde} % Your name
+
+\date{\normalsize 6$^{th}$ April, 2018} % Today's date or a custom date
+
+\usepackage{hyperref}
+\hypersetup
+{
+	colorlinks=true,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=blue,
+	linktoc=all,
+	linkcolor=blue,
+}
+
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+\section{Benchmark Functions}
+
+	\subsection{Overview}
+	For this project, we implemented fifteen standard benchmarking functions for optimization algorithms; namely, Schwefel's Function, De Jong's 1$^{\mathnormal{st}}$ Function, Rosenbrock's Saddle, Rastrigin's Function, Griewangk's Function, Sine Envelope Sine Wave Function, Stretch V Sine Wave Function, Ackley's Function (1), Ackley Function (2), Egg Holder, Rana's Function, Pathological Function, Michalewicz's Function, Master's Cosine Wave, and Schekel's Foxhole. These functions were implemented for to be used in benchmarking of algorithms for future projects. 
+			
+	\subsection{Testing}
+	Testing of these functions was done using a set of known optimal points, as well as random data. The results of the optimal points can be found in \hyperref[T1]{table 2.1}; some functions do not have a known optimal point, thus, this table is only partially filled in. Results for the random data can be found in \hyperref[T2]{table 2.2}. All random data was generated with the STL implementation of the mersenne twister (mt19937) and the numbers were generated in the range for each function. Furthermore, 100 samples were generated for all tests, and all statistical data displayed in \hyperref[T2]{table 2.2} is the average of the 100 data points.
+	\pagebreak
+\section{Analysis}
+
+	\subsection{Optimal Points}
+	\hyperref[T1]{Table 2.1} shows the results of the tests run with the known optimal points. Here we can see that the program correctly calculated all known global optima of the functions without error. 
+		
+	\subsection{Random Data}
+	On the other hand, the random data mostly generated garbage output (as is to be expected), however, the Sine Envelope Sine Wave function produced values fairly close to the optimums (-13.4235, -28.3385, -43.2535), also of note is that the standard deviation for this function was extremely small in all cases, with a minimum of 0.07 and a maximum of 14.05. Master's Cosine Wave also produced very clustered data with even smaller standard deviations than the Sine Envelope Sine Wave, ranging from 0.0031 to 0.04.\\ Another interesting part of the results is the execution time of the functions. All functions lost at most one magnitude in execution time when the input size was trippled, with some only increasing by a small fraction, namely De Jong's Function only increased by $2\times10^-7$ seconds when the dimensions went from 10 to 30. \\
+	
+\begin{minipage}{\linewidth}
+	\centering
+	\captionof{table}{Optimal Point Results} \label{tab:title} 
+	\begin{tabular}{c|cc|cc|cc}\label{T1}
+		Function        & $D_{10}$ & Expected & $D_{20}$ & Expected & $D_{30}$  & Expected \\
+		\hline
+		$f_1$ 			& -4189.83 & -4189.83 & -8379.66 & -8379.66 & -12569.5 & -12569.5 \\
+		$f_2$           & 0 & 0 & 0 & 0 &  0 & 0 \\
+		$f_3$           & 0 & 0 & 0 & 0 &  0 & 0 \\
+		$f_4$     		& -2000 & -2000 & -4000 & -4000 & -6000 & -6000 \\
+		$f_5$           & 0 & 0 & 0 & 0 &  0 & 0 \\
+		$f_6$    		& * & * & * & * &  * & * \\
+		$f_7$           & 0 & 0 & 0 & 0 &  0 & 0 \\
+		$f_8$    		& * & * & * & * &  * & * \\
+		$f_9$           & 0 & 0 & 0 & 0 &  0 & 0 \\
+		$f_{10}$   		& * & * & * & * &  * & * \\
+		$f_{11}$   		& * & * & * & * &  * & * \\
+		$f_{12}$   		& * & * & * & * &  * & * \\
+		$f_{13}$   		& * & * & * & * &  * & * \\
+		$f_{14}$     	& -9 & -9 & -19 & -19 &  -29 & -29 \\
+		$f_{15}$     	& * & * & * & * &  * & * \\
+	\end{tabular}
+	\bigskip\\
+	\small
+	\textit{* denotes that the optimal point is unknown}
+\end{minipage}
+
+
+
+%----------------------------------------------------------------------------------------
+
+
+\begin{sidewaystable}
+	\tiny
+	\centering
+	\caption{Computation comparison for 10, 20, and 30 Dimensions}
+	\label{Tab1d}
+	\begin{tabular}{c|ccccc|ccccc|ccccc}
+	\noalign{\smallskip}\hline\noalign{\smallskip}
+	Problem & \multicolumn{5}{c}{$D_{10}$}& \multicolumn{5}{|c|}{$D_{20}$}
+        &  \multicolumn{5}{c}{$D_{30}$} \\ 
+	\noalign{\smallskip}\hline\noalign{\smallskip}
+		 & Avg & Median & Range & SD & T(s) & Avg & Median
+                 & Range & SD & T(s) & Avg & Median & Range & SD &
+                 T(s) \\ 
+\noalign{\smallskip}\hline\noalign{\smallskip}
+			$f_1$ & $-61.82$ & $-46.80$ & $3177.65$ & $596.77$ & $2.77\times10^{-7}$ & $-147.22$ & $1.73$ & $4926.18$ & $917.83$ & $6.63\times10^{-7}$ & $-303.71$ & $-268.39$ & $5861.72$ & $1131.09$ & $1.16\times10^{-6}$ \\ 
+			$f_2$ & $859142$ & $838788$ & $1.75\times10^{6}$ & $237719$ & $1.40\times10^{-7}$ & $2.64\times10^{6}$ & $1.81\times10^{6}$ & $3.20\times10^{6}$ & $925823$ & $2.29\times10{-7}$ & $5.21\times10^{6}$ & $2.62\times10^{6}$ & $5.08\times10^{6}$ & $2.67\times10^{6}$ & $3.39\times10^{-7}$ \\ 
+			$f_3$ & $1.18\times10^{13}$ & $1.11\times10^{13}$ & $3.30\times10^{13}$ & $5.07\times10^{12}$ & $2.47\times10^{-8}$ & $3.79\times10^{13}$ & $2.63\times10^{13}$ & $6.22\times10^{13}$ & $1.47\times10^{13}$ & $9.58\times10^{-8}$ & $7.79\times10^{13}$ & $4.08\times10^{13}$ & $9.09\times10^{13}$ & $3.92\times10^{13}$ & $1.88\times10^{-7}$ \\ 
+			$f_4$ & $870095$ & $862871$ & $1.84\times10^{6}$ & $242235$ & $1.23\times10^{-7}$ & $2.62\times10^{6}$ & $1.77\times10^{6}$ & $3.85\times10^{6}$ & $942880$ & $4.96\times10^{-7}$ & $5.22\times10^{6}$ & $2.60\times10^{6}$ & $5.41\times10^{6}$ & $2.66\times10^{6}$ & $1.02\times10^{-6}$ \\ 
+			$f_5$ & $219.84$ & $207.35$ & $441.22$ & $69.07$ & $3.83\times10^{-7}$ & $661.70$ & $451.62$ & $871.89$ & $238.64$ & $6.84\times10^{-6}$ & $1315.61$ & $669.64$ & $1229.62$ & $668.70$ & $2.32\times10^{-6}$ \\ 
+			$f_6$ & $-4.52$ & $-4.50$ & $9.47$ & $0.07$ & $1.40\times10^{-7}$ & $-14.05$ & $-9.50$ & $19.63$ & $4.52$ & $5.44\times10^{-7}$ & $-28.60$ & $-14.51$ & $29.41$ & $14.05$ & $1.13\times10^{-6}$ \\ 
+			$f_7$ & $260.92$ & $260.03$ & $516.79$ & $30.19$ & $1.09\times10^{-6} $ & $809.14$ & $554.86$ & $1058.76$ & $265.18$ & $3.18\times10^{-6}$ & $1658.45$ & $849.75$ & $1709.94$ & $810.81$ & $6.28\times10^{-6}$ \\ 
+			$f_8$ & $2946.27$ & $2904.35$ & $5900.96$ & $484.65$ & $3.45\times10^{-7}$ & $9053.53$ & $6136.60$ & $12351$ & $3028.79$ & $9.64\times10{-7}$ & $18323.30$ & $9219.26$ & $18275.40$ & $9106.18$ & $1.84\times10^{-6}$ \\ 
+			$f_9$ & $194.55$ & $194.82$ & $386.62$ & $2.45$ & $5.54\times10^{-7}$ & $604.25$ & $409.68$ & $820.07$ & $194.57$ & $1.63\times10^{-6}$ & $1230.71$ & $626.90$ & $1251.74$ & $604.26$ & $3.31\times10^{-6}$ \\ 
+			$f_{10}$ & $1.33$ & $-15.76$ & $4025.12$ & $785.80 $& $6.77\times10^{-7}$ & $-12.44$ & $17.68$ & $6478.28$ & $1215.58$ & $1.98\times10^{-6}$ & $-168.11$ & $-59.29$ & $7074.71$ & $1604.07$ & $3.98\times10^{-6}$ \\ 
+			$f_{11}$ & $216.19$ & $231.67$ & $3699.49$ & $675.03$ & $4.89\times10^{-7}$ & $644.44$ & $454.87$ & $4076.84$ & $905.86$ & $1.45\times10^{-6}$ & $1225.32$ & $720.60$ & $5010.82$ & $1270.95$ & $2.85\times10^{-6}$ \\ 
+			$f_{12}$ & $4.50$ & $4.50$ & $9.04$ & $0.11$ & $3.49\times10^{-7}$ & $13.98$ & $9.50$ & $18.95$ & $4.50$ & $1.03\times10^{-6}$ & $28.48$ & $14.50$ & $28.93$ & $13.99$ & $2.05\times10^{-6}$ \\ 
+			$f_{13}$ & $-0.0736$ & $-0.0024$ & $4.13$ & $0.80$ & $9.44\times10^{-7}$ & $-0.0119$ & $0.0964$ & $7.29$ & $1.18$ & $2.73\times10^{-6}$ & $0.0929$ & $0.0393$ & $7.19$ & $1.35$ & $5.41\times10^{-6}$ \\ 
+			$f_{14}$ & $0.0031$ & $0 $& $0.41$ & $0.04$ & $9.23\times10^{-7}$ & $0.0031$ & $0$ & $1.18\times10^{-26}$ & $0.0031$ & $2.69\times10^{-6}$ & $0.0031$ & $0$ & $5.00\times10^{-13}$ & $0.0031$ & $5.31\times10^{-6}$ \\ 
+			$f_{15}$ & $-3.35\times10^{-5}$ & $-3.16\times10^{-5}$ & $0.00011$ & $9.98\times10^{-6}$ & $3.25\times10^{-7}$ & N/A & N/A & N/A & N/A & N/A & N/A & N/A & N/A & N/A & N/A \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+	Mean & $7.87\times10^{11}$ & $7.40\times10^{11}$ & $3.43\times10^{12}$ & $3.38\times10^{11}$ & $4.52\times10^{-7}$ & $2.71\times10^{12}$ & $1.88\times10^{12}$ & $4.44\times10^{12}$ & $1.05\times10^{12}$ & $1.75\times10^{-7}$ & $5.56\times10^{12}$ & $2.91\times10^{12}$ & $6.49\times10^{12}$ & $2.80\times10^{12}$ & $2.66\times10^{-6}$\\ 
+\noalign{\smallskip}\hline\noalign{\smallskip}
+\multicolumn{16}{l}{\tiny $^1$ 3.2GHz AMD Ryzen 7 1700X, 16 GB RAM}
+	\end{tabular}\label{T2}
+\end{sidewaystable}
+
+%----------------------------------------------------------------------------------------
+\end{document}
