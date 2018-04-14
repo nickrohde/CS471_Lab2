@@ -1,0 +1,2 @@
+﻿  Test.cpp
+c:\users\nicol\desktop\stuff\school\2_spring18\cs471\cs471_lab2\lab2\lab2\functions.hpp(312): warning C4244: 'initializing': conversion from 'unsigned __int64' to 'double', possible loss of data

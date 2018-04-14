@@ -63,7 +63,7 @@ int main(int argc, char ** argv)
 			max1 = 100;
 			https://stackoverflow.com/questions/14719911/how-do-we-pass-an-arbitrary-function-to-another-function
 	randomWalk(firstDeJongsFunction, 30, 1000000, &min1, &max1);
-	randomWalk(rosenbrockFunction, 30, 1000000, &min1, &max1);
+	randomWalk(rosenbrockFunction  , 30, 1000000, &min1, &max1);
 	*/
 	char choice = 'q';
 
