@@ -1,8 +1,14 @@
 #pragma once
 
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <chrono>
+
+
+
 
 
 #ifndef _PI
@@ -23,6 +29,12 @@
 #endif
 
 typedef unsigned int uint;
+
+typedef std::chrono::high_resolution_clock::time_point timePoint;
+
+typedef std::chrono::duration<double> duration;
+
+typedef std::chrono::high_resolution_clock highRes_Clock;
 
 
 template <typename T>
@@ -125,3 +137,5 @@ inline T minValueInVector(std::vector<T>* p_vect)
 
 	return p_vect->at(0);
 } // end template minValueInVector
+
+#endif

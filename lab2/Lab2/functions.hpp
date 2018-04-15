@@ -1,13 +1,22 @@
 #pragma once
 
-#include <vector>
+#ifndef _FUNCTIONS_H
+#define _FUNCTIONS_H
+
 #include <cmath>
 #include "utility.hpp"
 #include <functional>
 #include <cstdarg>
 
+
+
 namespace cost_functions
 {
+	typedef std::function<double(const std::vector<double>*)> costFunction; // readability
+
+	const int i_SHEKEL_INDEX = 14;
+
+
 	inline double schwefelsFunction(const std::vector<double>* vect)
 	{
 		double total = 0.0;
@@ -309,8 +318,8 @@ namespace cost_functions
 
 	inline double ranaFunction(const std::vector<double>* vect)
 	{
-		double total = 20 * (vect->size() - 1),
-			product = 0.0;
+		double	total = static_cast<double>(20 * (vect->size() - 1)),
+				product = 0.0;
 
 #pragma loop(hint_parallel(0))
 		// SUM[1->n-1]
@@ -463,9 +472,9 @@ namespace cost_functions
 	} // end method shekelsFoxholesFunction
 
 
-	const std::vector<std::function<double(const std::vector<double>*)>>& getAllCostFunctions(const double ** arg1, const std::size_t arg2)
-	{
-		static std::vector<std::function<double(const std::vector<double>*)>> functions
+	const std::vector<costFunction>& getAllCostFunctions(const double ** arg1, const std::size_t arg2);
+	/*{
+		static std::vector<costFunction> functions
 		{
 			schwefelsFunction ,
 			firstDeJongsFunction ,
@@ -481,9 +490,11 @@ namespace cost_functions
 			pathologicalFunction ,
 			michalewiczFunction ,
 			masterCosineWaveFunction ,
-			std::bind(shekelsFoxholesFunction, std::placeholders::_1, arg1, arg2),
+			std::bind(shekelsFoxholesFunction, std::placeholders::_1, arg1, arg2), // arguments are bound to make the signature the same for all functions
 		};
 
 		return functions;
-	} // end method getAllCostFunctions
+	} // end method getAllCostFunctions*/
 } // end namespace cost_functions
+
+#endif

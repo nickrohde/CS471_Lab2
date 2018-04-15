@@ -1,16 +1,10 @@
-#include <cmath>
 #include <iostream>
-#include <cstdlib>
-#include <fstream>
 #include <cctype>
-#include <vector>
 #include <chrono>
-#include <random>
-#include <algorithm>
-#include "utility.hpp"
-#include "functions.hpp"
+#include <functional>
+#include <vector>
 #include "randomWalk.hpp"
-
+#include "Test.hpp"
 
 
 using namespace std;
@@ -23,6 +17,7 @@ void presentMenu(void)
 	cout << "4 - All" << endl;
 	cout << "Q - Quit" << endl;
 } // end method presentMenu
+
 
 char getChoice(void)
 {
@@ -42,7 +37,7 @@ char getChoice(void)
 		cout << "Enter choice: ";
 		cin >> c;
 
-		if (cin.fail())
+		if (cin.fail()) // error check
 		{
 			cin.clear();
 			cin.ignore(std::cin.rdbuf()->in_avail());
@@ -59,13 +54,16 @@ char getChoice(void)
 
 int main(int argc, char ** argv)
 {
-	/*double 	min1 = -100,
-			max1 = 100;
-			https://stackoverflow.com/questions/14719911/how-do-we-pass-an-arbitrary-function-to-another-function
-	randomWalk(firstDeJongsFunction, 30, 1000000, &min1, &max1);
-	randomWalk(rosenbrockFunction  , 30, 1000000, &min1, &max1);
-	*/
+	const size_t ui_ITERATIONS = 100;
+
+
 	char choice = 'q';
+
+	Test *test = new Test();
+
+	timePoint	compute_start = highRes_Clock::now(),
+				compute_end = highRes_Clock::now();
+	duration	time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 	do
 	{
@@ -74,6 +72,17 @@ int main(int argc, char ** argv)
 		switch (choice)
 		{
 		case '1':
+			cout << "Starting tests for Random Walk ..." << endl;
+
+			compute_start = highRes_Clock::now();
+
+			test->runTest<randWlk>(randomWalk, ui_ITERATIONS);
+
+			compute_end = highRes_Clock::now();
+			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
+
+			cout << "Finished running tests for Random Walk." << endl;
+			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
 			break;
 
 		case '2':
@@ -83,14 +92,25 @@ int main(int argc, char ** argv)
 			break;
 
 		case '4':
+			cout << "Starting tests for Random Walk ..." << endl;
+			compute_start = highRes_Clock::now();
+
+			//test->runTest(randomWalk, ui_ITERATIONS);
+
+			compute_end = highRes_Clock::now();
+			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
+
+			cout << "Finished running tests for Random Walk." << endl;
+			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
 			break;
 
-		default:
+		default:			
 			break;
 		} // end switch
 	} while (tolower(choice) != 'q');
 
 
+	//delete test;
 
 
 	return EXIT_SUCCESS;

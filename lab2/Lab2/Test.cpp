@@ -1,71 +1,137 @@
 #include "Test.hpp"
-#include "utility.hpp"
-#include "functions.hpp"
 #include <fstream>
-#include <functional>
-#include <chrono>
-
-#define SHEKEL_OUTER_SIZE 30
-#define SHEKEL_INNER_SIZE 10
 
 
 using namespace std;
 
-template <typename F, typename... Args>
-void Test::runTest(F f, const size_t ui_ITERATIONS, Args... args)
+
+Test::Test(void)
 {
-	const size_t ui_SHEKEL_ITERATIOS = 10;
+	da_ranges = new double*[NUMBER_FUNCTIONS]; // array containing the ranges for the RNG; [i][0] contains min, [i][1] contains max for function f_i
 
-	double ** da_A = new double*[SHEKEL_OUTER_SIZE]();
-
-	makeMatrix(da_A);
-
-	vector<function<double(const vector<double>*)>> costFunctions = cost_functions::getAllCostFunctions(da_A, ui_SHEKEL_ITERATIOS);
-
-	vector<vector<results>> res;
-
-	vector<tuple<double, double>> ranges = {tuple<double,double>(-500,-500)};
+	makeRanges(da_ranges); // make matrix with ranges for functions
 
 
+	da_A = new double*[SHEKEL_OUTER_SIZE]; // shekels foxhole parameter that is bound to the function
+
+	makeMatrix(da_A); // make matrix A for shekels foxhole
+
+
+	costFunctions = cost_functions::getAllCostFunctions(const_cast<const double**>(da_A), ui_SHEKEL_ITERATIONS); // vector containing the cost functions
+
+	fileNames.push_back("10_dimensions.csv");
+	fileNames.push_back("20_dimensions.csv");
+	fileNames.push_back("30_dimensions.csv");
+
+	compute_start = compute_end = highRes_Clock::now();
+} // end Default Constructor
+
+
+Test::~Test(void)
+{
+	if (da_ranges != nullptr)
+	{
+		for (size_t i = 0; i < NUMBER_FUNCTIONS; i++)
+		{
+			delete[] da_ranges[i];
+		} // end for
+	} // end if
+
+	delete[] da_ranges;
+
+	if (da_A != nullptr)
+	{
+		for (size_t i = 0; i < SHEKEL_OUTER_SIZE; i++)
+		{
+			delete[] da_A[i];
+		} // end for
+	} // end if
+
+	delete[] da_A;
+} // end Destructor
+
+
+
+/*
+ * Type F: Strategy function (e.g. RW, LS, ILS, etc.)
+ * Type Args: Specific arguments for strategy function
+ *
+ * Executes the provided strategy with all 15 cost functions n times, where n is arg2.
+ * After testing is done, the statistics are calculated, and all data written to a csv file.
+ *
+ */
+template <typename F>
+void Test::runTest(F f, const size_t ui_ITERATIONS)
+{
+	// run all tests on 10, 20, and 30 dimensions
 	for (size_t ui_length = 10; ui_length <= 30; ui_length += 10)
 	{
-		res.push_back(vector<results>);
+		vector<results> res; // for statistics
 
+		// run each cost function with current dimension
 		for (int i = 0; i < costFunctions.size(); i++)
-		{
-			res.at((ui_length / 10) - 1).push_back(results);
+		{			
+			if (i == cost_functions::i_SHEKEL_INDEX && ui_length > 10) // only execute shekel with 10 dimensions
+			{
+				continue;
+			} // end if
 
-			results * temp = &res.at((ui_length / 10) - 1).at(i);
+			// initialize results for current function
+			res.push_back(results());
 
+			// pointer to current results
+			results * temp = &res.at(i);
+
+			// run each function n times
 			for (size_t j = 0; j < ui_ITERATIONS; j++)
 			{
-				results temp2 = f(costFunctions[i], ui_length, args);
+				compute_start = highRes_Clock::now();
 
-				if (temp->d_bestValue < temp2.d_bestValue)
+				results* temp2 = f(costFunctions[i], ui_length, ui_ITERATIONS, da_ranges[i][0], da_ranges[i][1]);
+				compute_end = highRes_Clock::now();
+
+				// update best value only when new best is found
+				if (temp->d_bestValue < temp2->d_bestValue)
 				{
-					temp->d_bestValue = temp2.d_bestValue;
-					temp->bestValues  = std::move(temp2.bestValues);
+					temp->d_bestValue = temp2->d_bestValue;
+					temp->bestValues  = std::move(temp2->bestValues);
 				} // end if
 
-				temp->d_avgValue += temp2.d_bestValue;
-				temp->d_range    += temp2.d_range;
-				temp->d_stdDev   += temp2.d_stdDev;
-				temp->d_avgTime  += 
+				time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
-				// store results in res[ui_length / 10][i] 
+				// statistics
+				temp->d_range  += getRange(temp2->data);
+				temp->d_stdDev += getStandardDeviation(temp2->data, temp2->d_avgValue);
+				temp->d_median += getMedian(temp2->data);
+				temp->d_avgValue += temp2->d_bestValue;
+				temp->d_avgTime  += time_to_compute.count();
 			} // end for j
+
+			// calculate averages
+			temp->d_avgValue /= ui_ITERATIONS;
+			temp->d_range    /= ui_ITERATIONS;
+			temp->d_stdDev   /= ui_ITERATIONS;
+			temp->d_avgTime  /= ui_ITERATIONS;
 		} // end for i
+
+		storeResults(fileNames.at((ui_length / 10) - 1), res);
 	} // end for length
 } // end template runTest
 
 
-void Test::storeResults(string s_fileName)
+void Test::storeResults(string& s_fileName, vector<results>& res)
 {
-	ofstream results(s_fileName);
+	ofstream results(s_fileName, ios::app | ios::out);
 
+	for (size_t i = 0; i < res.size(); i++)
+	{
+		results << "F" << (i + 1) << ",\n";
+		results << res.at(i);
+	} // end for
 
 	results.close();
-}
+} // end method storeResults
+
 
 inline void Test::makeMatrix(double**& da_A)
 {
@@ -100,3 +166,47 @@ inline void Test::makeMatrix(double**& da_A)
 	da_A[28] = new double[SHEKEL_INNER_SIZE]{ 9.496, 4.83, 3.15, 8.27, 5.079, 1.231, 5.731, 9.494, 1.883, 9.732 };
 	da_A[29] = new double[SHEKEL_INNER_SIZE]{ 4.138, 2.562, 2.532, 9.661, 5.611, 5.5, 6.886, 2.341, 9.699, 6.5 };
 } // end method makeMatrix
+
+
+inline void Test::makeRanges(double**& ranges)
+{
+	ranges[0]  = new double[2]{ -512, 512 };
+	ranges[1]  = new double[2]{ -100, 100 };
+	ranges[2]  = new double[2]{ -100, 100 };
+	ranges[3]  = new double[2]{  -30,  30 };
+	ranges[4]  = new double[2]{ -500, 500 };
+	ranges[5]  = new double[2]{  -30,  30 };
+	ranges[6]  = new double[2]{  -30,  30 };
+	ranges[7]  = new double[2]{  -32,  32 };
+	ranges[8]  = new double[2]{  -32,  32 };
+	ranges[9]  = new double[2]{ -500, 500 };
+	ranges[10] = new double[2]{ -500, 500 };
+	ranges[11] = new double[2]{ -100, 100 };
+	ranges[12] = new double[2]{    0, _PI };
+	ranges[13] = new double[2]{  -30,  30 };
+	ranges[14] = new double[2]{    0,  10 };
+} // end method makeRanges
+
+
+std::ostream& operator<<(std::ostream& stream, results& res)
+{
+	stream << "Optimum found: " << res.d_bestValue << ",\n";
+
+	stream << "Optimal point: ";
+
+	for (size_t i = 0; i < res.bestValues->size(); i++)
+	{
+		stream << ", " << res.bestValues->at(i);
+	} // end for
+
+	stream << ",\n";
+
+	stream << "Mean: " << res.d_avgValue << ",\n";
+	stream << "Median: " << res.d_median << ",\n";
+	stream << "Time: " << res.d_avgTime << ",\n";
+	stream << "Median: " << res.d_range << ",\n";
+	stream << "SD: " << res.d_stdDev << ",\n\n";
+
+	return stream;
+} // end operator << 
+

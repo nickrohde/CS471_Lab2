@@ -1,12 +1,32 @@
 #pragma once
 
-#include <vector>
+#ifndef _TEST_H
+#define _TEST_H
 #include <initializer_list>
+#include "functions.hpp"
 
-struct results
+
+#define SHEKEL_OUTER_SIZE 30
+#define SHEKEL_INNER_SIZE 10
+#define NUMBER_FUNCTIONS 15
+
+class results
 {
-	double d_range, d_stdDev, d_avgTime, d_avgValue, d_bestValue;
+public:
+
+	results()
+	{
+		d_range = d_stdDev = d_avgTime = d_avgValue = d_bestValue = d_median = 0.0;
+		bestValues = nullptr;
+		data = nullptr;
+	} // end Constructor
+
+	friend std::ostream& operator<<(std::ostream& stream, results& res);
+
+
+	double d_range, d_stdDev, d_avgTime, d_avgValue, d_bestValue, d_median;
 	std::vector<double>* bestValues;
+	std::vector<double>* data;
 };
 
 
@@ -14,23 +34,31 @@ struct results
 class Test
 {
 public:
-	Test(void) 
-	{
-		d_avgRange = d_avgStdDev = d_avgTime = d_avgValue = 0;
-	} // end Default Constructor
+	Test(void);
+	~Test(void);
 
-	template <typename F, typename... Args>
-	void runTest(F f, const std::size_t ui_ITERATIONS, Args... args);
+	template <typename F>
+	void runTest(F f, const std::size_t ui_ITERATIONS);
 
 
 private:
-	double	d_avgRange,
-			d_avgStdDev,
-			d_avgTime,
-			d_avgValue,
-		    d_avgBest;
+	const std::size_t ui_SHEKEL_ITERATIONS = 10;
 
-	void storeResults(std::string);
+	double ** da_ranges,
+		   ** da_A;
+
+	std::vector<cost_functions::costFunction> costFunctions;
+
+	std::vector<std::string> fileNames;
+
+	void storeResults(std::string&, std::vector<results>&);
 	void makeMatrix(double**&);
+	void makeRanges(double**&);
+
+	timePoint	compute_start,
+				compute_end;
+	duration	time_to_compute;
 	
 };
+
+#endif // !_TEST_H
