@@ -1,6 +1,0 @@
-﻿  Test.cpp
-  functions.cpp
-  driver.cpp
-  Generating Code...
-driver.obj : error LNK2019: unresolved external symbol "public: void __cdecl Test::runTest<class std::function<class results * __cdecl(class std::function<double __cdecl(class std::vector<double,class std::allocator<double> > const *)>,unsigned __int64,unsigned __int64,double,double)> >(class std::function<class results * __cdecl(class std::function<double __cdecl(class std::vector<double,class std::allocator<double> > const *)>,unsigned __int64,unsigned __int64,double,double)>,unsigned __int64)" (??$runTest@V?$function@$$A6APEAVresults@@V?$function@$$A6ANPEBV?$vector@NV?$allocator@N@std@@@std@@@Z@std@@_K1NN@Z@std@@@Test@@QEAAXV?$function@$$A6APEAVresults@@V?$function@$$A6ANPEBV?$vector@NV?$allocator@N@std@@@std@@@Z@std@@_K1NN@Z@std@@_K@Z) referenced in function main
-C:\Users\nicol\Desktop\Stuff\school\2_Spring18\CS471\CS471_Lab2\lab2\Lab2\x64\Debug\Lab2.exe : fatal error LNK1120: 1 unresolved externals
