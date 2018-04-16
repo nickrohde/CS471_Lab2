@@ -8,7 +8,8 @@
 
 #define SHEKEL_OUTER_SIZE 30
 #define SHEKEL_INNER_SIZE 10
-#define NUMBER_FUNCTIONS 15
+#define NUMBER_FUNCTIONS  15
+
 
 class results
 {
@@ -47,7 +48,7 @@ private:
 	double ** da_ranges,
 		   ** da_A;
 
-	std::vector<cost_functions::costFunction> costFunctions;
+	std::vector<costFunction> costFunctions;
 
 	std::vector<std::string> fileNames;
 

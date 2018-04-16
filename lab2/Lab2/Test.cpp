@@ -17,7 +17,7 @@ Test::Test(void)
 	makeMatrix(da_A); // make matrix A for shekels foxhole
 
 
-	costFunctions = cost_functions::getAllCostFunctions(const_cast<const double**>(da_A), ui_SHEKEL_ITERATIONS); // vector containing the cost functions
+	costFunctions = getAllCostFunctions(const_cast<const double**>(da_A), ui_SHEKEL_ITERATIONS); // vector containing the cost functions
 
 	fileNames.push_back("10_dimensions.csv");
 	fileNames.push_back("20_dimensions.csv");

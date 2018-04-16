@@ -45,7 +45,7 @@ char getChoice(void)
 		} // end if
 
 		c = static_cast<char>(tolower(static_cast<char>(c)));
-		
+
 	} while (c != '1' && c != '2' && c != '3' && c != '4' && c != 'q');
 
 	return c;
@@ -62,7 +62,7 @@ int main(int argc, char ** argv)
 	Test *test = new Test();
 
 	timePoint	compute_start = highRes_Clock::now(),
-				compute_end = highRes_Clock::now();
+		compute_end = highRes_Clock::now();
 	duration	time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 	do
@@ -104,7 +104,7 @@ int main(int argc, char ** argv)
 			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
 			break;
 
-		default:			
+		default:
 			break;
 		} // end switch
 	} while (tolower(choice) != 'q');
@@ -115,3 +115,4 @@ int main(int argc, char ** argv)
 
 	return EXIT_SUCCESS;
 } // end Main
+

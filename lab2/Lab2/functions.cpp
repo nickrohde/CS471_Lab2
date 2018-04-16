@@ -1,8 +1,7 @@
 #include "functions.hpp"
 
-using namespace cost_functions;
 
-const std::vector<costFunction>& cost_functions::getAllCostFunctions(const double ** arg1, const std::size_t arg2)
+const std::vector<costFunction>& getAllCostFunctions(const double ** arg1, const std::size_t arg2)
 {
 	static std::vector<costFunction> functions
 	{

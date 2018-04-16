@@ -6,9 +6,9 @@
 #include <limits>
 
 typedef std::function<double(const std::vector<double>*)> costFunction;
-typedef std::function < results*(cost_functions::costFunction, const std::size_t, const std::size_t, double, double)> randWlk;
+typedef std::function < results*(costFunction, const std::size_t, const std::size_t, double, double)> randWlk;
 
-results* randomWalk(cost_functions::costFunction f, const std::size_t ui_SIZE, const std::size_t ui_ITERATIONS, double d_min, double d_max)
+results* randomWalk(costFunction f, const std::size_t ui_SIZE, const std::size_t ui_ITERATIONS, double d_min, double d_max)
 {
 	double	d_best = std::numeric_limits<double>::max(),
 		d_result = 0,
