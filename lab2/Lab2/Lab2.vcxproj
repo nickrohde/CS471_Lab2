@@ -118,10 +118,12 @@
   <ItemGroup>
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="functions.cpp" />
+    <ClCompile Include="localSearch.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.hpp" />
+    <ClInclude Include="localSearch.hpp" />
     <ClInclude Include="randomWalk.hpp" />
     <ClInclude Include="Test.hpp" />
     <ClInclude Include="utility.hpp" />
