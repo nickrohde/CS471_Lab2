@@ -93,6 +93,16 @@
     </Configuration>
   </Settings>
   <VirtualDirectory Name="src">
-    <File Name="randomWalk.cpp"/>
+    <File Name="../../utility.hpp"/>
+    <File Name="../../Test.hpp"/>
+    <File Name="../../Test.cpp"/>
+    <File Name="../../Source.cpp"/>
+    <File Name="../../results.hpp"/>
+    <File Name="../../randomWalk.hpp"/>
+    <File Name="../../localSearch.hpp"/>
+    <File Name="../../localSearch.cpp"/>
+    <File Name="../../functions.hpp"/>
+    <File Name="../../functions.cpp"/>
+    <File Name="../../driver.cpp"/>
   </VirtualDirectory>
 </CodeLite_Project>
