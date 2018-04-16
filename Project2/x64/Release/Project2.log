@@ -1,0 +1,63 @@
+﻿  Source.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\type_traits(16707566): warning C4267: 'argument': conversion from 'size_t' to 'uint', possible loss of data
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\type_traits(16707566): note: see reference to function template instantiation 'results std::_Invoker_functor::_Call<results(__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double),_Ty,unsigned __int64,unsigned __int64,double,double>(_Callable,_Ty &&,unsigned __int64 &&,unsigned __int64 &&,double &&,double &&) noexcept(false)' being compiled
+          with
+          [
+              _Ty=cost_functions::costFunction,
+              _Callable=results (__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double)
+          ]
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\type_traits(15732480): note: see reference to function template instantiation 'results std::invoke<results(__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double),_Ty,unsigned __int64,unsigned __int64,double,double>(_Callable,_Ty &&,unsigned __int64 &&,unsigned __int64 &&,double &&,double &&) noexcept(false)' being compiled
+          with
+          [
+              _Ty=cost_functions::costFunction,
+              _Callable=results (__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double)
+          ]
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\functional(16707566): note: see reference to function template instantiation '_Rx std::_Invoker_ret<_Rx,false>::_Call<results(__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double),_Ty,unsigned __int64,unsigned __int64,double,double>(results (__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double),_Ty &&,unsigned __int64 &&,unsigned __int64 &&,double &&,double &&)' being compiled
+          with
+          [
+              _Rx=results,
+              _Ty=cost_functions::costFunction
+          ]
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\functional(16707566): note: see reference to function template instantiation '_Rx std::_Invoker_ret<_Rx,false>::_Call<results(__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double),_Ty,unsigned __int64,unsigned __int64,double,double>(results (__cdecl *&)(cost_functions::costFunction,::size_t,uint,double,double),_Ty &&,unsigned __int64 &&,unsigned __int64 &&,double &&,double &&)' being compiled
+          with
+          [
+              _Rx=results,
+              _Ty=cost_functions::costFunction
+          ]
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\functional(15732480): note: while compiling class template member function 'results std::_Func_impl_no_alloc<results (__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double),_Ret,cost_functions::costFunction,::size_t,::size_t,double,double>::_Do_call(cost_functions::costFunction &&,size_t &&,size_t &&,double &&,double &&)'
+          with
+          [
+              _Ret=results
+          ]
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\functional(261): note: see reference to class template instantiation 'std::_Func_impl_no_alloc<results (__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double),_Ret,cost_functions::costFunction,::size_t,::size_t,double,double>' being compiled
+          with
+          [
+              _Ret=results
+          ]
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\functional(513): note: see reference to class template instantiation 'std::_Is_large<_Impl>' being compiled
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\functional(702): note: see reference to function template instantiation 'void std::_Func_class<_Ret,cost_functions::costFunction,::size_t,::size_t,double,double>::_Reset<results(__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double)>(_Fx &&)' being compiled
+          with
+          [
+              _Ret=results,
+              _Fx=results (__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double)
+          ]
+  C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Tools\MSVC\14.12.25827\include\functional(702): note: see reference to function template instantiation 'void std::_Func_class<_Ret,cost_functions::costFunction,::size_t,::size_t,double,double>::_Reset<results(__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double)>(_Fx &&)' being compiled
+          with
+          [
+              _Ret=results,
+              _Fx=results (__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double)
+          ]
+  Source.cpp(1030): note: see reference to function template instantiation 'std::function<results (cost_functions::costFunction,::size_t,::size_t,double,double)>::function<results(__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double),void>(_Fx)' being compiled
+          with
+          [
+              _Fx=results (__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double)
+          ]
+  Source.cpp(1030): note: see reference to function template instantiation 'std::function<results (cost_functions::costFunction,::size_t,::size_t,double,double)>::function<results(__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double),void>(_Fx)' being compiled
+          with
+          [
+              _Fx=results (__cdecl *)(cost_functions::costFunction,::size_t,uint,double,double)
+          ]
+  Generating code
+  All 673 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Project2.vcxproj -> C:\Users\nicol\source\repos\Project2\x64\Release\Project2.exe

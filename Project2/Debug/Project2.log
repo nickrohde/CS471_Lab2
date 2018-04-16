@@ -1,0 +1,8 @@
+﻿  Source.cpp
+c:\users\nicol\source\repos\project2\source.cpp(758): warning C4018: '<': signed/unsigned mismatch
+  c:\users\nicol\source\repos\project2\source.cpp(1025): note: see reference to function template instantiation 'void Test::runTest<randWlk>(F,const ::size_t)' being compiled
+          with
+          [
+              F=randWlk
+          ]
+  Project2.vcxproj -> c:\users\nicol\source\repos\Project2\Debug\Project2.exe
