@@ -60,23 +60,20 @@ Test::~Test(void)
  * After testing is done, the statistics are calculated, and all data written to a csv file.
  *
  */
-template <typename F>
-void Test::runTest(F f, const size_t ui_ITERATIONS)
+/*template <typename F, typename... Args>
+void Test::runTest(F f, const size_t ui_ITERATIONS, Args... args)
 {
-	// run all tests on 10, 20, and 30 dimensions
 	for (size_t ui_length = 10; ui_length <= 30; ui_length += 10)
 	{
 		vector<results> res; // for statistics
 
-		// run each cost function with current dimension
 		for (int i = 0; i < costFunctions.size(); i++)
 		{			
-			if (i == cost_functions::i_SHEKEL_INDEX && ui_length > 10) // only execute shekel with 10 dimensions
+			if (i == i_SHEKEL_INDEX && ui_length > 10) // only execute shekel with 10 dimensions
 			{
 				continue;
 			} // end if
 
-			// initialize results for current function
 			res.push_back(results());
 
 			// pointer to current results
@@ -87,11 +84,10 @@ void Test::runTest(F f, const size_t ui_ITERATIONS)
 			{
 				compute_start = highRes_Clock::now();
 
-				results* temp2 = f(costFunctions[i], ui_length, ui_ITERATIONS, da_ranges[i][0], da_ranges[i][1]);
+				results* temp2 = f(costFunctions[i], ui_length, ui_ITERATIONS, da_ranges[i][0], da_ranges[i][1], args);
 				compute_end = highRes_Clock::now();
 
-				// update best value only when new best is found
-				if (temp->d_bestValue < temp2->d_bestValue)
+				if (temp->d_bestValue > temp2->d_bestValue)
 				{
 					temp->d_bestValue = temp2->d_bestValue;
 					temp->bestValues  = std::move(temp2->bestValues);
@@ -117,7 +113,7 @@ void Test::runTest(F f, const size_t ui_ITERATIONS)
 		storeResults(fileNames.at((ui_length / 10) - 1), res);
 	} // end for length
 } // end template runTest
-
+*/
 
 void Test::storeResults(string& s_fileName, vector<results>& res)
 {

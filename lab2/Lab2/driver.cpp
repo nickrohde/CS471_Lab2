@@ -1,20 +1,21 @@
 #include <iostream>
 #include <cctype>
-#include <chrono>
 #include <functional>
-#include <vector>
 #include "randomWalk.hpp"
-#include "Test.hpp"
+#include "localSearch.hpp"
+#include "utility.hpp"
+
 
 
 using namespace std;
+
+const size_t ui_ITERATIONS = 100;
 
 void presentMenu(void)
 {
 	cout << "1 - Random Walk" << endl;
 	cout << "2 - Local Search" << endl;
 	cout << "3 - Iterative Local Search" << endl;
-	cout << "4 - All" << endl;
 	cout << "Q - Quit" << endl;
 } // end method presentMenu
 
@@ -46,7 +47,7 @@ char getChoice(void)
 
 		c = static_cast<char>(tolower(static_cast<char>(c)));
 
-	} while (c != '1' && c != '2' && c != '3' && c != '4' && c != 'q');
+	} while (c != '1' && c != '2' && c != '3' && c != 'q');
 
 	return c;
 } // end method getChoice
@@ -56,13 +57,13 @@ int main(int argc, char ** argv)
 {
 	const size_t ui_ITERATIONS = 100;
 
+	Test *test = nullptr;
 
 	char choice = 'q';
 
-	Test *test = new Test();
 
 	timePoint	compute_start = highRes_Clock::now(),
-		compute_end = highRes_Clock::now();
+				compute_end   = highRes_Clock::now();
 	duration	time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 	do
@@ -74,34 +75,45 @@ int main(int argc, char ** argv)
 		case '1':
 			cout << "Starting tests for Random Walk ..." << endl;
 
+			test = new Test();
+
 			compute_start = highRes_Clock::now();
 
-			test->runTest<randWlk>(randomWalk, ui_ITERATIONS);
+			//typedef std::function<double(const std::vector<double>*)> costFunction;
+			//std::function<void(const std::vector<double>*)> ;
+
+
+			test->runTest(randomWalk, ui_ITERATIONS);
 
 			compute_end = highRes_Clock::now();
 			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 			cout << "Finished running tests for Random Walk." << endl;
 			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
+
+			delete test;
+
 			break;
 
 		case '2':
-			break;
+			cout << "Starting tests for Local Search ..." << endl;
 
-		case '3':
-			break;
+			test = new Test();
 
-		case '4':
-			cout << "Starting tests for Random Walk ..." << endl;
 			compute_start = highRes_Clock::now();
 
-			//test->runTest(randomWalk, ui_ITERATIONS);
+			test->runTest(localSearch, ui_ITERATIONS);
 
 			compute_end = highRes_Clock::now();
 			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 			cout << "Finished running tests for Random Walk." << endl;
 			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
+
+			delete test;
+			break;
+
+		case '3':
 			break;
 
 		default:
@@ -110,9 +122,11 @@ int main(int argc, char ** argv)
 	} while (tolower(choice) != 'q');
 
 
-	//delete test;
-
 
 	return EXIT_SUCCESS;
 } // end Main
+
+
+
+
 
