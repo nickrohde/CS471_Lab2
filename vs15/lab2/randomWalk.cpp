@@ -1,83 +1,52 @@
-#include <cmath>
-#include <iostream>
-#include <cstdlib>
-#include <fstream>
-#include <vector>
-#include <chrono>
-#include <random>
-#include <algorithm>
-
-using namespace std;
-
-typedef unsigned int uint;
+#include "randomWalk.hpp"
 
 
-template <typename T>
-inline T getRandomNumberInRange(const T* p_MIN, const T* p_MAX)
+results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, double d_max, std::size_t ui_ITERATIONS)
 {
-	static std::random_device rd{};
-	static std::mt19937 engine{ rd() };
-	static std::uniform_real_distribution<T> dist{ *p_MIN, *p_MAX };
+	double	d_best = std::numeric_limits<double>::max(),
+		d_result = 0,
+		d_avgValue = 0;
 
-	return dist(engine);
-} // end template getRandomNumberInRange
+	std::vector<double>* bestArgs = nullptr;
+	std::vector<double>* data = new std::vector<double>();
 
-
-template <typename T>
-inline vector<T>* getRandomVector(const std::size_t ui_SIZE, const T* p_MIN, const T* p_MAX)
-{
-	vector<T>* vec = new vector<T>(ui_SIZE);
-
-	for (std::size_t i = 0; i < ui_SIZE; i++)
+	for (std::size_t i = 0; i < ui_ITERATIONS; i++)
 	{
-		vec->at(i) = (getRandomNumberInRange(p_MIN, p_MAX));
-	} // end for
+		std::vector<double>* args = getRandomVector(ui_SIZE, &d_min, &d_max);
 
-	return vec;
-} // end template getRandomVector
-
-
-void randomWalk(double(*f)(vector<double>*), const size_t ui_SIZE, const uint ui_ITERATIONS, const double* d_MIN, const double* d_MAX)
-{
-	ofstream results("randomWalk.csv", ios::app | ios::out);
-	
-	double	d_best = exp(280),
-			d_result = 0;
-
-	vector<double>* bestArgs = NULL;
-
-	for (size_t i = 0; i < ui_ITERATIONS; i++)
-	{
-		vector<double>* args = getRandomVector(ui_SIZE, d_MIN, d_MAX);
-		
 		d_result = f(args);
 
-		results << d_result << ",";
+		d_avgValue += d_result;
 
 		if (d_result < d_best)
 		{
-			if (bestArgs != NULL)
+			if (bestArgs != nullptr)
 			{
 				delete bestArgs;
 			} // end if
-			
+
 			bestArgs = args;
 
-			d_best = d_best;
+			d_best = d_result;
+
+			// shrink search space whenever we find a better solution
+			d_min = minValueInVector(args);
+			d_max = maxValueInVector(args);
 		} // end if
 		else
 		{
 			delete args;
 		} // end else
 	} // end for
-}
 
+	d_avgValue /= ui_ITERATIONS;
 
-int main(int argc, char ** argv)
-{
+	// statistical results
+	results_t* res = new results_t();
+	res->bestValues = std::move(bestArgs);
+	res->d_avgValue = d_avgValue;
+	res->d_bestValue = d_best;
+	res->data = std::move(data);
 
-
-
-
-	return EXIT_SUCCESS;
-}
+	return res;
+} // end method randomWalk
