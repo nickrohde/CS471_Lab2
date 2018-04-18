@@ -1,7 +1,7 @@
 #include "randomWalk.hpp"
 
 
-results* randomWalk(costFunction f, const std::size_t ui_SIZE, const std::size_t ui_ITERATIONS, double d_min, double d_max)
+results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, double d_max, std::size_t ui_ITERATIONS)
 {
 	double	d_best = std::numeric_limits<double>::max(),
 		d_result = 0,
@@ -42,7 +42,7 @@ results* randomWalk(costFunction f, const std::size_t ui_SIZE, const std::size_t
 	d_avgValue /= ui_ITERATIONS;
 
 	// statistical results
-	results* res = new results();
+	results_t* res = new results_t();
 	res->bestValues = std::move(bestArgs);
 	res->d_avgValue = d_avgValue;
 	res->d_bestValue = d_best;

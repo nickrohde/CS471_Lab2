@@ -16,8 +16,11 @@ Test::Test(void)
 
 	makeMatrix(da_A); // make matrix A for shekels foxhole
 
+	ui_minDimensions = 10;
+	ui_maxDimensions = 30;
+	ui_dimensionDelta = 10;
 
-	costFunctions = getAllCostFunctions(const_cast<const double**>(da_A), ui_SHEKEL_ITERATIONS); // vector containing the cost functions
+	costFunctions = getAllCostFunctions(const_cast<const double**>(da_A), ui_SHEKEL_M); // vector containing the cost functions
 
 	fileNames.push_back("10_dimensions.csv");
 	fileNames.push_back("20_dimensions.csv");
@@ -51,71 +54,7 @@ Test::~Test(void)
 } // end Destructor
 
 
-
-/*
- * Type F: Strategy function (e.g. RW, LS, ILS, etc.)
- * Type Args: Specific arguments for strategy function
- *
- * Executes the provided strategy with all 15 cost functions n times, where n is arg2.
- * After testing is done, the statistics are calculated, and all data written to a csv file.
- *
- */
-/*template <typename F, typename... Args>
-void Test::runTest(F f, const size_t ui_ITERATIONS, Args... args)
-{
-	for (size_t ui_length = 10; ui_length <= 30; ui_length += 10)
-	{
-		vector<results> res; // for statistics
-
-		for (int i = 0; i < costFunctions.size(); i++)
-		{			
-			if (i == i_SHEKEL_INDEX && ui_length > 10) // only execute shekel with 10 dimensions
-			{
-				continue;
-			} // end if
-
-			res.push_back(results());
-
-			// pointer to current results
-			results * temp = &res.at(i);
-
-			// run each function n times
-			for (size_t j = 0; j < ui_ITERATIONS; j++)
-			{
-				compute_start = highRes_Clock::now();
-
-				results* temp2 = f(costFunctions[i], ui_length, ui_ITERATIONS, da_ranges[i][0], da_ranges[i][1], args);
-				compute_end = highRes_Clock::now();
-
-				if (temp->d_bestValue > temp2->d_bestValue)
-				{
-					temp->d_bestValue = temp2->d_bestValue;
-					temp->bestValues  = std::move(temp2->bestValues);
-				} // end if
-
-				time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
-
-				// statistics
-				temp->d_range  += getRange(temp2->data);
-				temp->d_stdDev += getStandardDeviation(temp2->data, temp2->d_avgValue);
-				temp->d_median += getMedian(temp2->data);
-				temp->d_avgValue += temp2->d_bestValue;
-				temp->d_avgTime  += time_to_compute.count();
-			} // end for j
-
-			// calculate averages
-			temp->d_avgValue /= ui_ITERATIONS;
-			temp->d_range    /= ui_ITERATIONS;
-			temp->d_stdDev   /= ui_ITERATIONS;
-			temp->d_avgTime  /= ui_ITERATIONS;
-		} // end for i
-
-		storeResults(fileNames.at((ui_length / 10) - 1), res);
-	} // end for length
-} // end template runTest
-*/
-
-void Test::storeResults(string& s_fileName, vector<results>& res)
+void Test::storeResults(string& s_fileName, vector<results_t>& res)
 {
 	ofstream results(s_fileName, ios::app | ios::out);
 
@@ -184,25 +123,5 @@ inline void Test::makeRanges(double**& ranges)
 } // end method makeRanges
 
 
-std::ostream& operator<<(std::ostream& stream, results& res)
-{
-	stream << "Optimum found: " << res.d_bestValue << ",\n";
 
-	stream << "Optimal point: ";
-
-	for (size_t i = 0; i < res.bestValues->size(); i++)
-	{
-		stream << ", " << res.bestValues->at(i);
-	} // end for
-
-	stream << ",\n";
-
-	stream << "Mean: " << res.d_avgValue << ",\n";
-	stream << "Median: " << res.d_median << ",\n";
-	stream << "Time: " << res.d_avgTime << ",\n";
-	stream << "Median: " << res.d_range << ",\n";
-	stream << "SD: " << res.d_stdDev << ",\n\n";
-
-	return stream;
-} // end operator << 
 

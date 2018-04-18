@@ -3,10 +3,8 @@
 #ifndef _FUNCTIONS_H
 #define _FUNCTIONS_H
 
-#include <cmath>		
-#include "utility.hpp"	// statistics/random functions
+#include "utility.hpp"
 #include <functional>
-#include <cstdarg>
 
 
 // cost function type, for readability

@@ -4,32 +4,12 @@
 #define _TEST_H
 #include <initializer_list>
 #include "functions.hpp"
+#include "results.hpp"
 
 
 #define SHEKEL_OUTER_SIZE 30
 #define SHEKEL_INNER_SIZE 10
 #define NUMBER_FUNCTIONS  15
-
-
-class results
-{
-public:
-
-	results(void)
-	{
-		d_range = d_stdDev = d_avgTime = d_avgValue = d_bestValue = d_median = 0.0;
-		bestValues = nullptr;
-		data = nullptr;
-	} // end Constructor
-
-	friend std::ostream& operator<<(std::ostream& stream, results& res);
-
-
-	double d_range, d_stdDev, d_avgTime, d_avgValue, d_bestValue, d_median;
-	std::vector<double>* bestValues;
-	std::vector<double>* data;
-};
-
 
 
 class Test
@@ -39,11 +19,11 @@ public:
 	~Test(void);
 
 	template <typename F, typename... Args>
-	void runTest(F f, const std::size_t ui_ITERATIONS, Args... args)
+	void runTest(F f, std::size_t ui_iterations, Args... args)
 	{
-		for (size_t ui_length = 10; ui_length <= 30; ui_length += 10)
+		for (size_t ui_length = ui_minDimensions; ui_length <= ui_maxDimensions; ui_length += ui_dimensionDelta)
 		{
-			vector<results> res; // for statistics
+			vector<results_t> res; // for statistics
 
 			for (int i = 0; i < costFunctions.size(); i++)
 			{
@@ -52,17 +32,17 @@ public:
 					continue;
 				} // end if
 
-				res.push_back(results());
+				res.push_back(results_t());
 
 				// pointer to current results
-				results * temp = &res.at(i);
+				results_t * temp = &res.at(i);
 
 				// run each function n times
-				for (size_t j = 0; j < ui_ITERATIONS; j++)
+				for (size_t j = 0; j < ui_iterations; j++)
 				{
 					compute_start = highRes_Clock::now();
 
-					results* temp2 = f(costFunctions[i], ui_length, ui_ITERATIONS, da_ranges[i][0], da_ranges[i][1] , args...);
+					results_t* temp2 = f(costFunctions[i], ui_length, da_ranges[i][0], da_ranges[i][1] , args...);
 					compute_end = highRes_Clock::now();
 
 					if (temp->d_bestValue > temp2->d_bestValue)
@@ -81,11 +61,11 @@ public:
 					temp->d_avgTime += time_to_compute.count();
 				} // end for j
 
-				  // calculate averages
-				temp->d_avgValue /= ui_ITERATIONS;
-				temp->d_range /= ui_ITERATIONS;
-				temp->d_stdDev /= ui_ITERATIONS;
-				temp->d_avgTime /= ui_ITERATIONS;
+				// calculate averages
+				temp->d_avgValue /= ui_iterations;
+				temp->d_range /= ui_iterations;
+				temp->d_stdDev /= ui_iterations;
+				temp->d_avgTime /= ui_iterations;
 			} // end for i
 
 			storeResults(fileNames.at((ui_length / 10) - 1), res);
@@ -95,23 +75,29 @@ public:
 
 
 private:
-	const std::size_t ui_SHEKEL_ITERATIONS = 10;
+	// Member Constants:
+	const std::size_t ui_SHEKEL_M = 10;
 
+	// Member Variables:
 	double ** da_ranges,
 		   ** da_A;
+
+	std::size_t	ui_minDimensions,
+				ui_maxDimensions,
+				ui_dimensionDelta;
+
+	timePoint	compute_start,
+				compute_end;
+	duration	time_to_compute;
 
 	std::vector<costFunction> costFunctions;
 
 	std::vector<std::string> fileNames;
 
-	void storeResults(std::string&, std::vector<results>&);
+	// Private Functions:
+	void storeResults(std::string&, std::vector<results_t>&);
 	void makeMatrix(double**&);
-	void makeRanges(double**&);
-
-	timePoint	compute_start,
-				compute_end;
-	duration	time_to_compute;
-	
+	void makeRanges(double**&);	
 };
 
 #endif // !_TEST_H

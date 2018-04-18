@@ -1,4 +1,6 @@
 #include "functions.hpp"
+#include <cmath>
+#include <cstdarg>
 
 
 inline double schwefelsFunction(const std::vector<double>* vect)

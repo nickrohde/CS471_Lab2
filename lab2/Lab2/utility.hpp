@@ -8,9 +8,6 @@
 #include <chrono>
 
 
-
-
-
 #ifndef _PI
 #define _PI 3.141592653589793238462643383279
 #endif // !_PI
@@ -30,11 +27,9 @@
 
 typedef unsigned int uint;
 
-typedef std::chrono::high_resolution_clock::time_point timePoint;
-
-typedef std::chrono::duration<double> duration;
-
-typedef std::chrono::high_resolution_clock highRes_Clock;
+typedef std::chrono::high_resolution_clock::time_point	timePoint;
+typedef std::chrono::duration<double>					duration;
+typedef std::chrono::high_resolution_clock				highRes_Clock;
 
 
 template <typename T>
