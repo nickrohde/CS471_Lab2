@@ -133,4 +133,24 @@ inline T minValueInVector(std::vector<T>* p_vect)
 	return p_vect->at(0);
 } // end template minValueInVector
 
+
+template <typename T>
+inline T convertStringToType(const std::string s)
+{
+	T t;
+	std::stringstream ss;
+
+	ss << s;
+	ss >> t;
+
+	return t;
+} // end template convertStringToType
+
+
+template <typename T>
+inline T getDistance(T a, T b)
+{
+	return sqrt(pow((b - a), 2));
+} // end template getDistance
+
 #endif

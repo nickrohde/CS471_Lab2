@@ -1,6 +1,6 @@
 #include "Test.hpp"
 #include <fstream>
-
+#include <sstream>
 
 using namespace std;
 
@@ -8,26 +8,45 @@ using namespace std;
 Test::Test(void)
 {
 	da_ranges = new double*[NUMBER_FUNCTIONS]; // array containing the ranges for the RNG; [i][0] contains min, [i][1] contains max for function f_i
-
-	makeRanges(da_ranges); // make matrix with ranges for functions
-
-
 	da_A = new double*[SHEKEL_OUTER_SIZE]; // shekels foxhole parameter that is bound to the function
-
+	makeRanges(da_ranges); // make matrix with ranges for functions
 	makeMatrix(da_A); // make matrix A for shekels foxhole
 
 	ui_minDimensions = 10;
 	ui_maxDimensions = 30;
 	ui_dimensionDelta = 10;
+	b_storeData = true;
 
 	costFunctions = getAllCostFunctions(const_cast<const double**>(da_A), ui_SHEKEL_M); // vector containing the cost functions
 
-	fileNames.push_back("10_dimensions.csv");
-	fileNames.push_back("20_dimensions.csv");
-	fileNames.push_back("30_dimensions.csv");
+	compute_start = compute_end = highRes_Clock::now();
+
+	LS_delta = { 4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,0.03,5.01,0.73 };
+} // end Default Constructor
+
+
+Test::Test(vector<double>* lsd, size_t ui_dimMin, size_t ui_dimMax, size_t ui_dimDelta, bool b_storeRes)
+{
+	ui_minDimensions = ui_dimMin;
+	ui_maxDimensions = ui_dimMax;
+	ui_dimensionDelta = ui_dimDelta;
+	b_storeData = b_storeRes;
 
 	compute_start = compute_end = highRes_Clock::now();
-} // end Default Constructor
+
+	for (auto& d: *lsd)
+	{
+		double temp = d;
+		LS_delta.push_back(temp);
+	} // end for
+
+	da_ranges = new double*[NUMBER_FUNCTIONS]; // array containing the ranges for the RNG; [i][0] contains min, [i][1] contains max for function f_i
+	da_A = new double*[SHEKEL_OUTER_SIZE]; // shekels foxhole parameter that is bound to the function
+	makeRanges(da_ranges); // make matrix with ranges for functions
+	makeMatrix(da_A); // make matrix A for shekels foxhole
+
+	costFunctions = getAllCostFunctions(const_cast<const double**>(da_A), ui_SHEKEL_M); // vector containing the cost functions
+} // end Constructor 4
 
 
 Test::~Test(void)
@@ -52,20 +71,6 @@ Test::~Test(void)
 
 	delete[] da_A;
 } // end Destructor
-
-
-void Test::storeResults(string& s_fileName, vector<results_t>& res)
-{
-	ofstream results(s_fileName, ios::app | ios::out);
-
-	for (size_t i = 0; i < res.size(); i++)
-	{
-		results << "F" << (i + 1) << ",\n";
-		results << res.at(i);
-	} // end for
-
-	results.close();
-} // end method storeResults
 
 
 inline void Test::makeMatrix(double**& da_A)
@@ -123,5 +128,64 @@ inline void Test::makeRanges(double**& ranges)
 } // end method makeRanges
 
 
+void Test::dumpDataToFile(string name, results_t* res)
+{
+	ofstream file(name, ios::out | ios::app);
 
+	file << "Time for run:," << res->d_avgTime << "\n";
+	file << "Solution found:, " << res->d_bestValue << "\n";
+	file << "Solution vector:,";
+
+	for (size_t i = 0; i < res->bestValues->size(); i++)
+	{
+		file << res->bestValues->at(i) << ",";
+	} // end for
+
+	file << "\nData:\n";
+
+	for (size_t i = 0; i < res->data->size(); i++)
+	{
+		file << "," << res->data->at(i) << "\n";
+	} // end for
+
+	file << "\n";
+	
+	file.close();
+} // end dumpDataToFile
+
+
+string Test::makeFileName(std::size_t ui_dim, int i_functionNumber)
+{
+	stringstream name;
+
+	name << "results_" << ui_dim << "_f" << (i_functionNumber + 1) << ".csv" ;
+
+	return name.str();
+}
+
+
+std::ostream& operator<<(std::ostream& stream, results_t& res)
+{
+	stream << "Dimensions: " << res.bestValues->size() << "\n";
+
+	stream << "Optimal solution found: " << res.d_bestValue << "\n";
+
+	stream << "Time to compute: " << res.d_avgTime << "\n";
+
+	stream << "Optimal point: [ ";
+
+	for (size_t i = 0; i < res.bestValues->size(); i++)
+	{
+		stream  << res.bestValues->at(i);
+
+		if ((i + 1) < res.bestValues->size())
+		{
+			stream << ", ";
+		} // end if
+	} // end for
+
+	stream << " ]" << endl;
+
+	return stream;
+} // end operator << 
 

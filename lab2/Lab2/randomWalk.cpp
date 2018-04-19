@@ -1,11 +1,11 @@
 #include "randomWalk.hpp"
 
 
-results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, double d_max, std::size_t ui_ITERATIONS)
+results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, double d_max, double unused, std::size_t ui_ITERATIONS)
 {
-	double	d_best = std::numeric_limits<double>::max(),
-		d_result = 0,
-		d_avgValue = 0;
+	double	d_best		= std::numeric_limits<double>::max(),
+			d_result	= 0,
+			d_avgValue	= 0;
 
 	std::vector<double>* bestArgs = nullptr;
 	std::vector<double>* data = new std::vector<double>();
