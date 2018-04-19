@@ -37,7 +37,7 @@ inline T getRandomNumberInRange(const T* p_MIN, const T* p_MAX)
 {
 	static std::random_device rd{};
 	static std::mt19937 engine{ rd() };
-	static std::uniform_real_distribution<T> dist{ *p_MIN, *p_MAX };
+	std::uniform_real_distribution<T> dist{ *p_MIN, *p_MAX };
 
 	return dist(engine);
 } // end template getRandomNumberInRange
@@ -132,5 +132,25 @@ inline T minValueInVector(std::vector<T>* p_vect)
 
 	return p_vect->at(0);
 } // end template minValueInVector
+
+
+template <typename T>
+inline T convertStringToType(const std::string s)
+{
+	T t;
+	std::stringstream ss;
+
+	ss << s;
+	ss >> t;
+
+	return t;
+} // end template convertStringToType
+
+
+template <typename T>
+inline T getDistance(T a, T b)
+{
+	return sqrt(pow((b - a), 2));
+} // end template getDistance
 
 #endif

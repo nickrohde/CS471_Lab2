@@ -27,26 +27,4 @@ public:
 	std::vector<double>* data;
 };
 
-std::ostream& operator<<(std::ostream& stream, results_t& res)
-{
-	stream << "Optimum found: " << res.d_bestValue << ",\n";
-
-	stream << "Optimal point: ";
-
-	for (size_t i = 0; i < res.bestValues->size(); i++)
-	{
-		stream << ", " << res.bestValues->at(i);
-	} // end for
-
-	stream << ",\n";
-
-	stream << "Mean: " << res.d_avgValue << ",\n";
-	stream << "Median: " << res.d_median << ",\n";
-	stream << "Time: " << res.d_avgTime << ",\n";
-	stream << "Median: " << res.d_range << ",\n";
-	stream << "SD: " << res.d_stdDev << ",\n\n";
-
-	return stream;
-} // end operator << 
-
 #endif

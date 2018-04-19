@@ -17,16 +17,23 @@ class Driver
 public:
 
 	Driver(void);
-	Driver(const std::string& s_fileName);
+	Driver(std::string& s_fileName);
 
 	~Driver(void);
 
 	int run(void);
 
 private:
-	size_t ui_iterations;
+	size_t	ui_iterations,
+			ui_numILSItr,
+			ui_numFunctions,
+			ui_startDim,
+			ui_endDim,
+			ui_dimDelta;
 
-	double d_LS_deltaX;
+	bool	b_storeData,
+			b_invalid,
+			b_stop;	
 
 	timePoint	compute_start,
 				compute_end;
@@ -34,13 +41,15 @@ private:
 
 	Test* test;
 
+	std::vector<double> LS_deltaX;
+
 	void presentMenu(void);
 	char getChoice(void);
 
 	std::string& askUserForFileName(void);
 	char askUserYesNo(void);
 
-	void initialize(std::string& s_fileName);
+	void initialize(const std::string& s_fileName);
 
 }; // end class Driver
 

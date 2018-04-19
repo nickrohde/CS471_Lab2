@@ -1,9 +1,11 @@
 #include <iostream>
+#include <sstream>
 #include <cctype>
 #include <fstream>
 #include <functional>
 #include "randomWalk.hpp"
 #include "localSearch.hpp"
+#include "iterativeLocalSearch.hpp"
 #include "utility.hpp"
 #include "Driver.hpp"
 #include "IniParser.hpp"
@@ -85,42 +87,138 @@ char Driver::askUserYesNo(void)
 } // end method askUserYesNo
 
 
-void Driver::initialize(std::string & s_fileName)
+void Driver::initialize(const std::string & s_fileName)
 {
+	IniParser* parser = new IniParser(s_fileName);
 
+	// extract data from .ini file
+	ui_startDim		= convertStringToType<size_t>((*parser)("DIM", "min"));   // smallest dimension to test
+	ui_endDim		= convertStringToType<size_t>((*parser)("DIM", "max"));   // largest dimension to test
+	ui_dimDelta		= convertStringToType<size_t>((*parser)("DIM", "delta")); // dimension increase
 
+	if (ui_startDim > ui_endDim || ui_startDim < 2 || ui_startDim > 50 || ui_endDim < 2 || ui_endDim > 75)
+	{
+		delete parser;
+		throw new invalid_argument("Start dimension must be bigger than end dimension; valid [DIM] range start: [2,50] - end: [2,75]");
+	} // end if
+
+	ui_iterations	= convertStringToType<size_t>((*parser)("TEST", "num_test_itrs"));
+	b_storeData		= convertStringToType<bool>((*parser)("TEST", "store_data"));
+	ui_numFunctions = convertStringToType<size_t>((*parser)("FUNCTIONS", "total"));
+	ui_numILSItr	= convertStringToType<size_t>((*parser)("FUNCTIONS", "num_ILS_itrs"));
+
+	if (ui_numFunctions <= 0 || ui_iterations <= 0)
+	{
+		delete parser;
+		throw new invalid_argument("Number of functions and number of iterations must be positive integer!");
+	} // end if
+
+	for (size_t i = 1; i <= ui_numFunctions; i++)
+	{
+		stringstream ss;
+		ss << "f" << i;
+
+		double temp = convertStringToType<double>((*parser)("LS_DELTA", ss.str()));
+
+		if (temp == 0.0)
+		{
+			delete parser;
+			throw new invalid_argument("Delta values for local search must be non-zero floats!");
+		} // end if
+
+		LS_deltaX.push_back(temp);
+	} // end for
+
+	b_invalid = false;
+
+	delete parser;
 } // end method initialize
 
 
 Driver::Driver(void)
 {
-	d_LS_deltaX = 0.21;
-	ui_iterations = 100;
-}
+	ui_iterations   = 30;
+	ui_numILSItr    =  5;
+	ui_numFunctions = 15;
+	ui_startDim     = 10;
+	ui_endDim       = 30;
+	ui_dimDelta     = 10;
+		
+	b_storeData     = true;
+	b_invalid       = false;
+	b_stop			= false;
+
+	compute_start = compute_end = highRes_Clock::now();
+
+	LS_deltaX = { 4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,0.03,5.01,0.73 };
+} // end Default Constructor
 
 
-Driver::Driver(const string& s_fileName)
+Driver::Driver(string& s_fileName)
 {
 	compute_start   = highRes_Clock::now(),
 	compute_end     = highRes_Clock::now();
 	time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
+	b_invalid = true;
+
 	test = nullptr;
 
 	ifstream file(s_fileName.c_str(), ios::in);
 
-
 	if (file.is_open() && !file.bad())
 	{
+		file.close();
 
+		for (;;)
+		{
+			try
+			{
+				initialize(s_fileName);
+				break;
+			} // end try
+			catch (invalid_argument e)
+			{
+				cout << "An error occurred while passing the ini file!" << endl;
+				cout << "Error: " << e.what();
+				s_fileName = askUserForFileName();
+
+				if (b_stop)
+				{
+					break;
+				} // end if
+			} // end catch
+		} // end forever
 	} // end if
 	else
 	{
+		file.close();
 
+		for (;;)
+		{
+			cout << "The file \"" << s_fileName << "\" could not be opened." << endl;
+
+			s_fileName = askUserForFileName();
+			if (b_stop)
+			{
+				break;
+			} // end if
+
+			try
+			{
+				initialize(s_fileName);
+				break;
+			} // end try
+			catch (invalid_argument e)
+			{
+				cout << "An error occurred while passing the ini file!" << endl;
+				cout << "Error: " << e.what();
+			} // end catch
+		} // end forever
 	} // end else
 
-	file.close();
-} // end Constructor
+	b_invalid = false;
+} // end Constructor 1
 
 
 Driver::~Driver(void)
@@ -134,6 +232,12 @@ int Driver::run(void)
 {
 	char choice = 'q';
 
+	if (b_invalid)
+	{
+		return EXIT_FAILURE; // ini file parsing was unsuccessful
+	} // end if
+
+	test = new Test(&LS_deltaX, ui_startDim, ui_endDim, ui_dimDelta, b_storeData);
 
 	do
 	{
@@ -142,9 +246,7 @@ int Driver::run(void)
 		switch (choice)
 		{
 		case '1':
-			cout << "Starting tests for Random Walk ..." << endl;
-
-			test = new Test();
+			cout << "Starting tests for Random Walk ..." << endl;			
 
 			compute_start = highRes_Clock::now();
 
@@ -154,31 +256,38 @@ int Driver::run(void)
 			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 			cout << "Finished running tests for Random Walk." << endl;
-			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
-
-			delete test;
+			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;		
 
 			break;
 
 		case '2':
-			cout << "Starting tests for Local Search ..." << endl;
-
-			test = new Test();
+			cout << "Starting tests for Local Search ..." << endl;			
 
 			compute_start = highRes_Clock::now();
 
-			test->runTest<lclSrch>(localSearch, ui_iterations, d_LS_deltaX);
+			test->runTest<lclSrch>(localSearch, ui_iterations);
 
 			compute_end = highRes_Clock::now();
 			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
-			cout << "Finished running tests for Random Walk." << endl;
+			cout << "Finished running tests for Local Search." << endl;
 			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
 
-			delete test;
 			break;
 
 		case '3':
+			cout << "Starting tests for Iterative Local Search ..." << endl;
+
+			compute_start = highRes_Clock::now();
+
+			test->runTest<itrLclSrch>(iterativeLocalSearch, ui_iterations, ui_numILSItr);
+
+			compute_end = highRes_Clock::now();
+			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
+
+			cout << "Finished running tests for Iterative Local Search." << endl;
+			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
+
 			break;
 
 		default:
@@ -186,8 +295,9 @@ int Driver::run(void)
 		} // end switch
 	} while (tolower(choice) != 'q');
 
+	delete test;
 
-	return true;
+	return EXIT_SUCCESS;
 } // end method run
 
 
@@ -196,6 +306,8 @@ string& Driver::askUserForFileName(void)
 	// Variables:
 	string s_name = "";
 	string s_check = "";
+
+	b_stop = false;
 
 	for(;;)
 	{
@@ -229,7 +341,8 @@ string& Driver::askUserForFileName(void)
 						if (c == 'n')
 						{
 							cout << "Exiting ..." << endl;
-							exit(EXIT_FAILURE);
+							b_stop = true;
+							return s_check;
 						} // end if
 					} // end if
 
@@ -244,7 +357,8 @@ string& Driver::askUserForFileName(void)
 					if (c == 'n')
 					{
 						cout << "Exiting ..." << endl;
-						exit(EXIT_FAILURE);
+						b_stop = true;
+						return s_check;
 					} // end if
 				} // end else
 			} // end if (s_check == ".ini")
@@ -257,7 +371,8 @@ string& Driver::askUserForFileName(void)
 		if (c == 'n')
 		{
 			cout << "Exiting ..." << endl;
-			exit(EXIT_FAILURE);
+			b_stop = true;
+			return s_check;
 		} // end if
 	} // end forever
 

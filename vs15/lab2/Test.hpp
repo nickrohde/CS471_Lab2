@@ -16,6 +16,7 @@ class Test
 {
 public:
 	Test(void);
+	Test(std::vector<double>* lsd, std::size_t ui_dimMin, std::size_t ui_dimMax, std::size_t ui_dimDelta, bool b_storeData);
 	~Test(void);
 
 	template <typename F, typename... Args>
@@ -42,7 +43,7 @@ public:
 				{
 					compute_start = highRes_Clock::now();
 
-					results_t* temp2 = f(costFunctions[i], ui_length, da_ranges[i][0], da_ranges[i][1] , args...);
+					results_t* temp2 = f(costFunctions[i], ui_length, da_ranges[i][0], da_ranges[i][1], LS_delta.at(i), args...);
 					compute_end = highRes_Clock::now();
 
 					if (temp->d_bestValue > temp2->d_bestValue)
@@ -53,22 +54,26 @@ public:
 
 					time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
-					// statistics
-					temp->d_range += getRange(temp2->data);
-					temp->d_stdDev += getStandardDeviation(temp2->data, temp2->d_avgValue);
-					temp->d_median += getMedian(temp2->data);
-					temp->d_avgValue += temp2->d_bestValue;
-					temp->d_avgTime += time_to_compute.count();
-				} // end for j
+					temp2->d_avgTime = time_to_compute.count();
 
-				// calculate averages
-				temp->d_avgValue /= ui_iterations;
-				temp->d_range /= ui_iterations;
-				temp->d_stdDev /= ui_iterations;
-				temp->d_avgTime /= ui_iterations;
+					if (b_storeData)
+					{
+						dumpDataToFile(makeFileName(ui_length, i), temp2);
+					} // end if
+
+					delete temp2;
+				} // end for j
 			} // end for i
 
-			storeResults(fileNames.at((ui_length / 10) - 1), res);
+			if (!b_storeData) // ouput results to stdout if user choses not to use file
+			{
+				int i = 1;
+				for (auto& r : res)
+				{
+					cout << "F" << i << " results: " << endl;
+					cout << r;
+				} // end for
+			} // end if
 		} // end for length
 	} // end template runTest
 
@@ -86,18 +91,22 @@ private:
 				ui_maxDimensions,
 				ui_dimensionDelta;
 
+	bool b_storeData;
+
 	timePoint	compute_start,
 				compute_end;
 	duration	time_to_compute;
 
 	std::vector<costFunction> costFunctions;
+	std::vector<double> LS_delta;
 
-	std::vector<std::string> fileNames;
 
 	// Private Functions:
-	void storeResults(std::string&, std::vector<results_t>&);
 	void makeMatrix(double**&);
 	void makeRanges(double**&);	
+	void dumpDataToFile(std::string, results_t* res);
+
+	std::string makeFileName(std::size_t, int);
 };
 
 #endif // !_TEST_H
