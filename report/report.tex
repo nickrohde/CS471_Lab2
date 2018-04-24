@@ -57,7 +57,7 @@
 \normalfont \normalsize 
 \textsc{Central Washington University, Department of Computer Science} \\ [25pt] % Your university, school and/or department name(s)
 \horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
-\huge CS471 Project 1 \\ % The assignment title
+\huge CS471 Project 2 \\ % The assignment title
 \horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
 }
 
@@ -88,11 +88,11 @@
 
 \section{Benchmark Functions}
 
-	\subsection{Overview}
-	For this project, we implemented fifteen standard benchmarking functions for optimization algorithms; namely, Schwefel's Function, De Jong's 1$^{\mathnormal{st}}$ Function, Rosenbrock's Saddle, Rastrigin's Function, Griewangk's Function, Sine Envelope Sine Wave Function, Stretch V Sine Wave Function, Ackley's Function (1), Ackley Function (2), Egg Holder, Rana's Function, Pathological Function, Michalewicz's Function, Master's Cosine Wave, and Schekel's Foxhole. These functions were implemented for to be used in benchmarking of algorithms for future projects. 
+	\subsection{Introduction}
+	This program implements three optimization searches, namely, Random Walk (RW), Local Search (LS), and Iterative Local Search (ILS). All of these stratgies start with a random point in the search space, and then attempt to find a more optimal solution based on this point. The RW strategy does this in the most basic way by simply picking a new random point and checking if this is a better solution or not; once a certain number of points have been picked, the RW algorithm terminates and returns the best value located. On the other hand, the LS strategy checks a point near the previous point and continuously does this process until no better solution can be found in the neighbourhood of the previous point. ILS is simply a repeated version of LS, instead of only searching the neighborhood of one starting point, we pick a certain number of random starting points and search the neighborhoods of all of them. On top of this, ILS has the ability to redefine what "neighborhood" means by altering the $\delta x$ value. This is done based on the solutions that have been found previously, namely, if the value was previously increased and this resulted in a better solution, we will continue to do this; conversely, if we increased the value previously and this resulted in a worse solution, we will decrease it next time. This allows ILS to fine tune the $\delta x$ value to find a good value.
 			
-	\subsection{Testing}
-	Testing of these functions was done using a set of known optimal points, as well as random data. The results of the optimal points can be found in \hyperref[T1]{table 2.1}; some functions do not have a known optimal point, thus, this table is only partially filled in. Results for the random data can be found in \hyperref[T2]{table 2.2}. All random data was generated with the STL implementation of the mersenne twister (mt19937) and the numbers were generated in the range for each function. Furthermore, 100 samples were generated for all tests, and all statistical data displayed in \hyperref[T2]{table 2.2} is the average of the 100 data points.
+	\subsection{Experimentation}
+	 
 	\pagebreak
 \section{Analysis}
 
