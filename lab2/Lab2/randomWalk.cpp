@@ -1,33 +1,44 @@
 #include "randomWalk.hpp"
 
+using namespace std;
 
-results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, double d_max, double unused, std::size_t ui_ITERATIONS)
+results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, double d_max, double unused, bool b_storeData, std::size_t ui_ITERATIONS)
 {
-	double	d_best		= std::numeric_limits<double>::max(),
-			d_result	= 0,
-			d_avgValue	= 0;
+	results_t* res = new results_t();
 
-	std::vector<double>* bestArgs = nullptr;
-	std::vector<double>* data = new std::vector<double>();
-
-	for (std::size_t i = 0; i < ui_ITERATIONS; i++)
+	if (b_storeData)
 	{
-		std::vector<double>* args = getRandomVector(ui_SIZE, &d_min, &d_max);
+		res->data = new std::vector<double>();
+	} // end if
+
+	// pointers for convenience
+	double*	d_best = &(res->d_bestValue),
+			d_result = 0;
+
+	vector<double>** bestArgs = &(res->bestValues);
+	vector<double>** data	  = &(res->data);
+
+	for (size_t i = 0; i < ui_ITERATIONS; i++)
+	{
+		vector<double>* args = getRandomVector(ui_SIZE, &d_min, &d_max);
 
 		d_result = f(args);
 
-		d_avgValue += d_result;
-
-		if (d_result < d_best)
+		if (b_storeData)
 		{
-			if (bestArgs != nullptr)
+			(*data)->push_back(d_result);
+		} // end if
+
+		if (d_result < *d_best)
+		{
+			if (*bestArgs != nullptr)
 			{
-				delete bestArgs;
+				delete (*bestArgs);
 			} // end if
 
-			bestArgs = args;
+			*bestArgs = std::move(args);
 
-			d_best = d_result;
+			*d_best = d_result;
 
 			// shrink search space whenever we find a better solution
 			d_min = minValueInVector(args);
@@ -39,14 +50,8 @@ results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, d
 		} // end else
 	} // end for
 
-	d_avgValue /= ui_ITERATIONS;
-
-	// statistical results
-	results_t* res = new results_t();
-	res->bestValues = std::move(bestArgs);
-	res->d_avgValue = d_avgValue;
-	res->d_bestValue = d_best;
-	res->data = std::move(data);
+	bestArgs = nullptr;
+	data = nullptr;
 
 	return res;
 } // end method randomWalk

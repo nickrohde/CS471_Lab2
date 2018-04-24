@@ -9,6 +9,8 @@ Test::Test(void)
 {
 	da_ranges = new double*[NUMBER_FUNCTIONS]; // array containing the ranges for the RNG; [i][0] contains min, [i][1] contains max for function f_i
 	da_A = new double*[SHEKEL_OUTER_SIZE]; // shekels foxhole parameter that is bound to the function
+
+	// these two function only exist to make the constructor shorter
 	makeRanges(da_ranges); // make matrix with ranges for functions
 	makeMatrix(da_A); // make matrix A for shekels foxhole
 
@@ -21,7 +23,7 @@ Test::Test(void)
 
 	compute_start = compute_end = highRes_Clock::now();
 
-	LS_delta = { 4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,0.03,5.01,0.73 };
+	LS_delta = vector<double>{ 0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21,0.21 };
 } // end Default Constructor
 
 
@@ -34,14 +36,12 @@ Test::Test(vector<double>* lsd, size_t ui_dimMin, size_t ui_dimMax, size_t ui_di
 
 	compute_start = compute_end = highRes_Clock::now();
 
-	for (auto& d: *lsd)
-	{
-		double temp = d;
-		LS_delta.push_back(temp);
-	} // end for
+	LS_delta = *lsd;
 
 	da_ranges = new double*[NUMBER_FUNCTIONS]; // array containing the ranges for the RNG; [i][0] contains min, [i][1] contains max for function f_i
 	da_A = new double*[SHEKEL_OUTER_SIZE]; // shekels foxhole parameter that is bound to the function
+
+	// these two function only exist to make the constructor shorter
 	makeRanges(da_ranges); // make matrix with ranges for functions
 	makeMatrix(da_A); // make matrix A for shekels foxhole
 
@@ -51,25 +51,38 @@ Test::Test(vector<double>* lsd, size_t ui_dimMin, size_t ui_dimMax, size_t ui_di
 
 Test::~Test(void)
 {
-	if (da_ranges != nullptr)
+	try
 	{
-		for (size_t i = 0; i < NUMBER_FUNCTIONS; i++)
+		if (da_A != nullptr)
 		{
-			delete[] da_ranges[i];
-		} // end for
-	} // end if
+			for (int i = 0; i < SHEKEL_OUTER_SIZE; i++)
+			{
+				delete[] da_A[i];
+			} // end for
 
-	delete[] da_ranges;
-
-	if (da_A != nullptr)
+			delete[] da_A;
+		} // end if	
+	}
+	catch (exception e)
 	{
-		for (size_t i = 0; i < SHEKEL_OUTER_SIZE; i++)
+		cout << "deleting matrix broke" << endl;
+	}
+	try
+	{
+		if (da_ranges != nullptr)
 		{
-			delete[] da_A[i];
-		} // end for
-	} // end if
+			for (int i = 0; i < NUMBER_FUNCTIONS; i++)
+			{
+				delete[] da_ranges[i];
+			} // end for
 
-	delete[] da_A;
+			delete[] da_ranges;
+		} // end if
+	}
+	catch (exception e)
+	{
+		cout << "deleting matrix broke" << endl;
+	}	
 } // end Destructor
 
 
@@ -108,38 +121,29 @@ inline void Test::makeMatrix(double**& da_A)
 } // end method makeMatrix
 
 
-inline void Test::makeRanges(double**& ranges)
+inline void Test::makeRanges(double**& da_ranges)
 {
-	ranges[0]  = new double[2]{ -512, 512 };
-	ranges[1]  = new double[2]{ -100, 100 };
-	ranges[2]  = new double[2]{ -100, 100 };
-	ranges[3]  = new double[2]{  -30,  30 };
-	ranges[4]  = new double[2]{ -500, 500 };
-	ranges[5]  = new double[2]{  -30,  30 };
-	ranges[6]  = new double[2]{  -30,  30 };
-	ranges[7]  = new double[2]{  -32,  32 };
-	ranges[8]  = new double[2]{  -32,  32 };
-	ranges[9]  = new double[2]{ -500, 500 };
-	ranges[10] = new double[2]{ -500, 500 };
-	ranges[11] = new double[2]{ -100, 100 };
-	ranges[12] = new double[2]{    0, _PI };
-	ranges[13] = new double[2]{  -30,  30 };
-	ranges[14] = new double[2]{    0,  10 };
+	da_ranges[0]  = new double[2]{ -512, 512 };
+	da_ranges[1]  = new double[2]{ -100, 100 };
+	da_ranges[2]  = new double[2]{ -100, 100 };
+	da_ranges[3]  = new double[2]{  -30,  30 };
+	da_ranges[4]  = new double[2]{ -500, 500 };
+	da_ranges[5]  = new double[2]{  -30,  30 };
+	da_ranges[6]  = new double[2]{  -30,  30 };
+	da_ranges[7]  = new double[2]{  -32,  32 };
+	da_ranges[8]  = new double[2]{  -32,  32 };
+	da_ranges[9]  = new double[2]{ -500, 500 };
+	da_ranges[10] = new double[2]{ -500, 500 };
+	da_ranges[11] = new double[2]{ -100, 100 };
+	da_ranges[12] = new double[2]{    0, _PI };
+	da_ranges[13] = new double[2]{  -30,  30 };
+	da_ranges[14] = new double[2]{    0,  10 };
 } // end method makeRanges
 
 
-void Test::dumpDataToFile(string name, results_t* res)
+void Test::dumpDataToFile(string s_name, results_t* res)
 {
-	ofstream file(name, ios::out | ios::app);
-
-	file << "Time for run:," << res->d_avgTime << "\n";
-	file << "Solution found:, " << res->d_bestValue << "\n";
-	file << "Solution vector:,";
-
-	for (size_t i = 0; i < res->bestValues->size(); i++)
-	{
-		file << res->bestValues->at(i) << ",";
-	} // end for
+	ofstream file(s_name, ios::out | ios::app);
 
 	file << "\nData:\n";
 
@@ -154,37 +158,67 @@ void Test::dumpDataToFile(string name, results_t* res)
 } // end dumpDataToFile
 
 
-string Test::makeFileName(std::size_t ui_dim, int i_functionNumber)
+void Test::writeResultsToFile(results_t* res)
+{
+	ofstream file("results.csv", ios::out | ios::app);
+
+	file << "Time for run:," << res->d_avgTime << "\n";
+	file << "Solution found:, " << res->d_bestValue << "\n";
+	
+	if (res->bestValues != nullptr)
+	{
+		file << "Solution vector:,";
+
+		for (size_t i = 0; i < res->bestValues->size(); i++)
+		{
+			file << res->bestValues->at(i) << ",";
+		} // end for
+	} // end if
+
+	file.close();
+} // end method 
+
+
+string Test::makeFileName(size_t ui_dim, int i_functionNumber)
 {
 	stringstream name;
 
-	name << "results_" << ui_dim << "_f" << (i_functionNumber + 1) << ".csv" ;
+	name << "data_" << ui_dim << "_f" << (i_functionNumber + 1) << ".csv" ;
 
 	return name.str();
 }
 
+/* -------------------------- End of Class Test -------------------------- */
 
-std::ostream& operator<<(std::ostream& stream, results_t& res)
+// definition of results_t::operator<<
+// this is just here to avoid having an extra file to compile
+std::ostream& operator<<(ostream& stream, results_t& res)
 {
-	stream << "Dimensions: " << res.bestValues->size() << "\n";
+	if (res.bestValues != nullptr)
+	{
+		stream << "Dimensions: " << res.bestValues->size() << "\n";
+	} // end if
 
 	stream << "Optimal solution found: " << res.d_bestValue << "\n";
 
 	stream << "Time to compute: " << res.d_avgTime << "\n";
 
-	stream << "Optimal point: [ ";
-
-	for (size_t i = 0; i < res.bestValues->size(); i++)
+	if (res.bestValues != nullptr)
 	{
-		stream  << res.bestValues->at(i);
+		stream << "Optimal point: [ ";
 
-		if ((i + 1) < res.bestValues->size())
+		for (size_t i = 0; i < res.bestValues->size(); i++)
 		{
-			stream << ", ";
-		} // end if
-	} // end for
+			stream << res.bestValues->at(i);
 
-	stream << " ]" << endl;
+			if ((i + 1) < res.bestValues->size())
+			{
+				stream << ", ";
+			} // end if
+		} // end for
+
+		stream << " ]" << endl;
+	} // end if
 
 	return stream;
 } // end operator << 

@@ -87,47 +87,49 @@ char Driver::askUserYesNo(void)
 } // end method askUserYesNo
 
 
-void Driver::initialize(const std::string & s_fileName)
+void Driver::initialize(const std::string  s_fileName)
 {
 	IniParser* parser = new IniParser(s_fileName);
 
-	// extract data from .ini file
-	ui_startDim		= convertStringToType<size_t>((*parser)("DIM", "min"));   // smallest dimension to test
-	ui_endDim		= convertStringToType<size_t>((*parser)("DIM", "max"));   // largest dimension to test
-	ui_dimDelta		= convertStringToType<size_t>((*parser)("DIM", "delta")); // dimension increase
-
-	if (ui_startDim > ui_endDim || ui_startDim < 2 || ui_startDim > 50 || ui_endDim < 2 || ui_endDim > 75)
+	try
 	{
-		delete parser;
-		throw new invalid_argument("Start dimension must be bigger than end dimension; valid [DIM] range start: [2,50] - end: [2,75]");
-	} // end if
+		// extract data from .ini file
+		ui_startDim = convertStringToType<size_t>((*parser)("DIM", "min"));   // smallest dimension to test
+		ui_endDim = convertStringToType<size_t>((*parser)("DIM", "max"));   // largest dimension to test
+		ui_dimDelta = convertStringToType<size_t>((*parser)("DIM", "delta")); // dimension increase
 
-	ui_iterations	= convertStringToType<size_t>((*parser)("TEST", "num_test_itrs"));
-	b_storeData		= convertStringToType<bool>((*parser)("TEST", "store_data"));
-	ui_numFunctions = convertStringToType<size_t>((*parser)("FUNCTIONS", "total"));
-	ui_numILSItr	= convertStringToType<size_t>((*parser)("FUNCTIONS", "num_ILS_itrs"));
-
-	if (ui_numFunctions <= 0 || ui_iterations <= 0)
-	{
-		delete parser;
-		throw new invalid_argument("Number of functions and number of iterations must be positive integer!");
-	} // end if
-
-	for (size_t i = 1; i <= ui_numFunctions; i++)
-	{
-		stringstream ss;
-		ss << "f" << i;
-
-		double temp = convertStringToType<double>((*parser)("LS_DELTA", ss.str()));
-
-		if (temp == 0.0)
+		ui_iterations = convertStringToType<size_t>((*parser)("TEST", "num_test_itrs"));
+		b_storeData = convertStringToType<bool>((*parser)("TEST", "store_data"));
+		ui_numFunctions = convertStringToType<size_t>((*parser)("FUNCTIONS", "total"));
+		ui_numILSItr = convertStringToType<size_t>((*parser)("FUNCTIONS", "num_ILS_itrs"));
+	
+		if (ui_numFunctions <= 0 || ui_iterations <= 0)
 		{
 			delete parser;
-			throw new invalid_argument("Delta values for local search must be non-zero floats!");
+			throw invalid_argument("Number of functions and number of iterations must be positive integer!");
 		} // end if
 
-		LS_deltaX.push_back(temp);
-	} // end for
+		for (size_t i = 1; i <= ui_numFunctions; i++)
+		{
+			stringstream ss;
+			ss << "f" << i;
+
+			double temp = convertStringToType<double>((*parser)("LS_DELTA", ss.str()));
+
+			if (temp == 0.0)
+			{
+				delete parser;
+				throw invalid_argument("Delta values for local search must be non-zero floats!");
+			} // end if
+
+			LS_deltaX.push_back(temp);
+		} // end for
+	} // end try
+	catch (invalid_argument e)
+	{
+		delete parser;
+		throw e; // handled above
+	} // end catch
 
 	b_invalid = false;
 
@@ -135,35 +137,28 @@ void Driver::initialize(const std::string & s_fileName)
 } // end method initialize
 
 
+bool Driver::isValid(void)
+{
+	return !b_invalid;
+} // end method isValid
+
+
 Driver::Driver(void)
 {
-	ui_iterations   = 30;
-	ui_numILSItr    =  5;
-	ui_numFunctions = 15;
-	ui_startDim     = 10;
-	ui_endDim       = 30;
-	ui_dimDelta     = 10;
-		
-	b_storeData     = true;
-	b_invalid       = false;
-	b_stop			= false;
-
-	compute_start = compute_end = highRes_Clock::now();
-
-	LS_deltaX = { 4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,0.03,5.01,0.73 };
-} // end Default Constructor
-
-
-Driver::Driver(string& s_fileName)
-{
-	compute_start   = highRes_Clock::now(),
-	compute_end     = highRes_Clock::now();
+	// initialize variables
+	compute_start = highRes_Clock::now(),
+	compute_end = highRes_Clock::now();
 	time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 	b_invalid = true;
 
-	test = nullptr;
+	test = nullptr; // this object is created by run
+} // end Default Constructor
 
+
+Driver::Driver(string s_fileName) : Driver()
+{
+	// attempt to parse .ini file
 	ifstream file(s_fileName.c_str(), ios::in);
 
 	if (file.is_open() && !file.bad())
@@ -179,13 +174,22 @@ Driver::Driver(string& s_fileName)
 			} // end try
 			catch (invalid_argument e)
 			{
-				cout << "An error occurred while passing the ini file!" << endl;
-				cout << "Error: " << e.what();
+				cout << "A required field was not found the file!" << endl;
+				cout << e.what() << endl << endl;
+				cout << "Try different file?" << endl;
+				clearInput();
+				char c = askUserYesNo();
+
+				if (c == 'n')
+				{
+					return; // the object is in an invalid state
+				} // end if
+
 				s_fileName = askUserForFileName();
 
 				if (b_stop)
 				{
-					break;
+					return; // the object is in an invalid state
 				} // end if
 			} // end catch
 		} // end forever
@@ -197,11 +201,20 @@ Driver::Driver(string& s_fileName)
 		for (;;)
 		{
 			cout << "The file \"" << s_fileName << "\" could not be opened." << endl;
+			cout << "Try different file?" << endl;
+			clearInput();
+			char c = askUserYesNo();
+
+			if (c == 'n')
+			{
+				return; // the object is in an invalid state
+			} // end if
 
 			s_fileName = askUserForFileName();
+
 			if (b_stop)
 			{
-				break;
+				return; // the object is in an invalid state
 			} // end if
 
 			try
@@ -211,8 +224,15 @@ Driver::Driver(string& s_fileName)
 			} // end try
 			catch (invalid_argument e)
 			{
-				cout << "An error occurred while passing the ini file!" << endl;
+				cout << "An error occurred while parsing the ini file!" << endl;
 				cout << "Error: " << e.what();
+				cout << "Try different file?" << endl;
+				char c = askUserYesNo();
+
+				if (c == 'n')
+				{
+					return; // the object is in an invalid state
+				} // end if
 			} // end catch
 		} // end forever
 	} // end else
@@ -221,19 +241,13 @@ Driver::Driver(string& s_fileName)
 } // end Constructor 1
 
 
-Driver::~Driver(void)
-{
-
-
-} // end Destructor
-
-
 int Driver::run(void)
 {
 	char choice = 'q';
 
 	if (b_invalid)
 	{
+		cout << "Parsing of the .ini file failed. Exiting ..." << endl;
 		return EXIT_FAILURE; // ini file parsing was unsuccessful
 	} // end if
 
@@ -241,57 +255,65 @@ int Driver::run(void)
 
 	do
 	{
-		choice = getChoice();
+		clearInput();
+		choice = getChoice(); // get user input for which algorithm to run
 
 		switch (choice)
 		{
-		case '1':
-			cout << "Starting tests for Random Walk ..." << endl;			
+			case '1':
+			{
+				cout << "Starting tests for Random Walk ..." << endl;
 
-			compute_start = highRes_Clock::now();
+				compute_start = highRes_Clock::now(); // start timer for whole run
 
-			test->runTest<randWlk>(randomWalk, ui_iterations, ui_iterations);
+				test->runTest<randWlk>(randomWalk, ui_iterations, b_storeData, ui_iterations);
 
-			compute_end = highRes_Clock::now();
-			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
+				compute_end = highRes_Clock::now();
+				time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
-			cout << "Finished running tests for Random Walk." << endl;
-			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;		
+				cout << "Finished running tests for Random Walk." << endl;
+				cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
 
-			break;
+				break;
+			} // end case 1
 
-		case '2':
-			cout << "Starting tests for Local Search ..." << endl;			
+			case '2':
+			{	
+				cout << "Starting tests for Local Search ..." << endl;
 
-			compute_start = highRes_Clock::now();
+				compute_start = highRes_Clock::now(); // start timer for whole run
 
-			test->runTest<lclSrch>(localSearch, ui_iterations);
+				test->runTest<lclSrch>(localSearch, b_storeData, ui_iterations);
 
-			compute_end = highRes_Clock::now();
-			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
+				compute_end = highRes_Clock::now();
+				time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
-			cout << "Finished running tests for Local Search." << endl;
-			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
+				cout << "Finished running tests for Local Search." << endl;
+				cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
 
-			break;
+				break;
+			} // end case 2
 
-		case '3':
-			cout << "Starting tests for Iterative Local Search ..." << endl;
+			case '3':
+			{
+				cout << "Starting tests for Iterative Local Search ..." << endl;
+				cout << "This may take upwards of 10 minutes." << endl;
 
-			compute_start = highRes_Clock::now();
+				compute_start = highRes_Clock::now(); // start timer for whole run
 
-			test->runTest<itrLclSrch>(iterativeLocalSearch, ui_iterations, ui_numILSItr);
+				test->runTest<itrLclSrch>(iterativeLocalSearch, ui_iterations, b_storeData, ui_numILSItr);
 
-			compute_end = highRes_Clock::now();
-			time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
+				compute_end = highRes_Clock::now();
+				time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
-			cout << "Finished running tests for Iterative Local Search." << endl;
-			cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
+				cout << "Finished running tests for Iterative Local Search." << endl;
+				cout << "Time elapsed: " << time_to_compute.count() << " seconds." << endl << endl;
 
-			break;
+				break;
+			} // end case 3
 
-		default:
-			break;
+			default:
+				break;
 		} // end switch
 	} while (tolower(choice) != 'q');
 
@@ -301,80 +323,65 @@ int Driver::run(void)
 } // end method run
 
 
-string& Driver::askUserForFileName(void)
+string Driver::askUserForFileName(void)
 {
 	// Variables:
 	string s_name = "";
-	string s_check = "";
 
 	b_stop = false;
 
 	for(;;)
 	{
-		cout << "Please enter a file name: ";
+		cout << "Please enter the name of the .ini file: ";
+		clearInput();
 		getline(cin, s_name);
 
-		if (s_name.length() > 4)
+		if (s_name.length() > 0)
 		{
-			s_check = s_name.substr(s_name.length() - 4, s_name.length() - 1);
-
-			if (s_check == ".ini")
-			{
 				ifstream file(s_name, ios::in);
 
 				if (!file.bad() && file.is_open())
 				{
-					// check if file contains anything
-					file.seekg(0, ios::end);
-					size_t size = file.tellg();
-
-					if (size > 0)
-					{
-						break;
-					} // end if (size > 0)
-					else
-					{
-						cout << "The file \"" << s_name << "\" does not contain anything." << endl;
-						cout << "Try again? ";
-						char c = askUserYesNo();
-
-						if (c == 'n')
-						{
-							cout << "Exiting ..." << endl;
-							b_stop = true;
-							return s_check;
-						} // end if
-					} // end if
-
 					file.close();
-				} // end if (!file.bad() && file.is_open())
+					return s_name;
+				} // end if 
 				else
 				{
+					file.close();
 					cout << "The file \"" << s_name << "\" could not be opened." << endl;
-					cout << "Try again? ";
+					cout << "Try different file?" << endl;
+					clearInput();
 					char c = askUserYesNo();
 
 					if (c == 'n')
 					{
-						cout << "Exiting ..." << endl;
 						b_stop = true;
-						return s_check;
+						return "";
 					} // end if
 				} // end else
-			} // end if (s_check == ".ini")
-		} // end if (s_name.length() > 4)
-
-		cout << "Invalid input!" << endl;
-		cout << "Try again? ";
-		char c = askUserYesNo();
-
-		if (c == 'n')
+		} // end if (s_name.length() > 0)
+		else
 		{
-			cout << "Exiting ..." << endl;
-			b_stop = true;
-			return s_check;
-		} // end if
+			cout << "Invalid input!" << endl;
+			cout << "Try again?" << endl;
+			clearInput();
+			char c = askUserYesNo();
+
+			if (c == 'n')
+			{
+				cout << "Exiting ..." << endl;
+				b_stop = true;
+				return "";
+			} // end if
+		} // end else
 	} // end forever
 
 	return s_name;
 } // end method askUserForFileName
+
+
+void Driver::clearInput()
+{
+	cin.clear();
+	cin.ignore(std::cin.rdbuf()->in_avail());
+} // end method clearInput

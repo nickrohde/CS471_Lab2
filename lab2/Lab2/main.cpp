@@ -4,41 +4,11 @@
 
 using namespace std;
 
-char askUserYesNo(void)
-{
-	char c = 0x0;
-	bool first = true;
 
-	do
-	{
-		if (!first)
-		{
-			cout << "Invalid input! Try again." << endl;
-		} // end if
-		first = false;
-
-		cout << "Enter choice (Y/N): ";
-		cin >> c;
-
-		if (cin.fail()) // error check
-		{
-			cin.clear();
-			cin.ignore(std::cin.rdbuf()->in_avail());
-			continue;
-		} // end if
-
-		c = static_cast<char>(tolower(static_cast<char>(c)));
-
-	} while (c != 'y' && c != 'n');
-
-	return c;
-} // end method askUserYesNo
-
-/**
- * Program entry point. 
- * Input: Takes 1 command line parameter, the name of the .ini file to retrieve config info from.
- * Output: 0 on successful execution of the program, 1 otherwise.
- */
+/// <summary>Program entry point.</summary> 
+/// <param name="argc">Number of command line arguments passed to main.</param>
+/// <param name="argv">Array of string containing the name of a ini file to parse, or nothing.</param>
+/// <returns>0 on successful execution, 1 otherwise.</returns>
 int main(int argc, char ** argv)
 {
 	Driver* driver = nullptr;
@@ -51,26 +21,16 @@ int main(int argc, char ** argv)
 	} // end if
 	else // no ini file parameter
 	{
-		char c;
-
-		cout << "No ini file provided!\nUse default settings?";
-		c = askUserYesNo();
-
-		if (c == 'n')
-		{
-			string s("none");
-			driver = new Driver(s);
-		} // end if
-		else
-		{
-			cout << "Using default settings." << endl;
-			driver = new Driver();
-		} // end else (c == 'y')
+		cout << "No ini parameter received. Attempting to open \"config.ini\" file." << endl;
+		driver = new Driver("config.ini");
 	} // end else (argc <= 1)
 	
 	try
 	{
-		i_exitCode = driver->run();
+		if (driver->isValid())
+		{
+			i_exitCode = driver->run();
+		} // end if
 	} // end try
 	catch (exception e)
 	{

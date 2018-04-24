@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <sstream>
 
 using namespace std;
 
@@ -22,6 +23,18 @@ IniParser::~IniParser(void)
 
 string IniParser::operator()(const string& s_group, const string& s_key)
 {
+	if ((*values).count(s_group) == 0)
+	{
+		string error = ("The group " + s_group + " was not found in the .ini file.");
+		throw invalid_argument(error);
+	} // end if
+
+	if ((*(*values)[s_group]).count(s_key) == 0)
+	{
+		string error = ("The group " + s_group + " does not contain the key " + s_key + ".");
+		throw invalid_argument(error); 
+	} // end if
+
 	return (*(*values)[s_group])[s_key];
 } // end operator()
 
