@@ -17,9 +17,14 @@ public:
 	{
 		d_avgTime = d_bestValue = std::numeric_limits<double>::max();
 		ui_functionCalls = 0;
-		bestValues = nullptr;
-		data = nullptr;
 	} // end Constructor
+
+	/// <summary>Destructor.</summary>
+	~results_t(void)
+	{
+		data.clear();
+		bestValues.clear();
+	} // end Destructor
 
 	// Operators:
 	/// <summary>Stream insertion operator. Inserts the contents of this object into the output stream object <paramref name="stream"/>.</summary>
@@ -39,10 +44,10 @@ public:
 	std::size_t ui_functionCalls;
 
 	/// <summary>Best input vector found.</summary>
-	std::vector<double>* bestValues;
+	std::vector<double> bestValues;
 
 	/// <summary>All data points.</summary>
-	std::vector<double>* data;
+	std::vector<double> data;
 }; // end class results_t
 
 #endif

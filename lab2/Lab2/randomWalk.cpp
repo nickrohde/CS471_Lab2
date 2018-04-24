@@ -6,17 +6,12 @@ results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, d
 {
 	results_t* res = new results_t();
 
-	if (b_storeData)
-	{
-		res->data = new std::vector<double>();
-	} // end if
-
 	// pointers for convenience
 	double*	d_best = &(res->d_bestValue),
 			d_result = 0;
 
-	vector<double>** bestArgs = &(res->bestValues);
-	vector<double>** data	  = &(res->data);
+	vector<double>* bestArgs = &(res->bestValues);
+	vector<double>* data	 = &(res->data);
 
 	for (size_t i = 0; i < ui_ITERATIONS; i++)
 	{
@@ -24,19 +19,21 @@ results_t* randomWalk(costFunction f, const std::size_t ui_SIZE, double d_min, d
 
 		d_result = f(args);
 
+		res->ui_functionCalls += 1;
+
 		if (b_storeData)
 		{
-			(*data)->push_back(d_result);
+			(*data).push_back(d_result);
 		} // end if
 
 		if (d_result < *d_best)
 		{
-			if (*bestArgs != nullptr)
+			if ((*bestArgs).size() > 0)
 			{
-				delete (*bestArgs);
+				(*bestArgs).clear();
 			} // end if
 
-			*bestArgs = std::move(args);
+			*bestArgs = *args;
 
 			*d_best = d_result;
 

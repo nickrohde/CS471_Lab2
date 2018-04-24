@@ -67,7 +67,7 @@ public:
 					if (temp->d_bestValue > temp2->d_bestValue)
 					{
 						temp->d_bestValue = temp2->d_bestValue;
-						temp->bestValues = std::move(temp2->bestValues);
+						temp->bestValues = temp2->bestValues;
 					} // end if
 
 					time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);

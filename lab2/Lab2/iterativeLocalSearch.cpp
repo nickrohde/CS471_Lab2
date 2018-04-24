@@ -11,9 +11,13 @@ results_t * iterativeLocalSearch(costFunction f, const std::size_t ui_SIZE, doub
 	// initialize best value
 	p_res = localSearch(f, ui_SIZE, d_min, d_max, d_deltaX, b_storeData);
 
+	size_t ui_functionCalls = 0; // total # of function calls
+
 	for (size_t i = 1; i < ui_iterations; i++)
 	{
 		results_t * p_temp = localSearch(f, ui_SIZE, d_min, d_max, d_deltaX, b_storeData);
+
+		ui_functionCalls += p_temp->ui_functionCalls;
 
 		if (p_temp->d_bestValue < p_res->d_bestValue)
 		{
@@ -26,6 +30,8 @@ results_t * iterativeLocalSearch(costFunction f, const std::size_t ui_SIZE, doub
 			delete p_temp;
 		} // end else
 	} // end for
+
+	p_res->ui_functionCalls = ui_functionCalls;
 
 	return p_res;
 } // end method iterativeLocalSearch

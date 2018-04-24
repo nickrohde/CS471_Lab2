@@ -147,9 +147,9 @@ void Test::dumpDataToFile(string s_name, results_t* res)
 
 	file << "\nData:\n";
 
-	for (size_t i = 0; i < res->data->size(); i++)
+	for (size_t i = 0; i < res->data.size(); i++)
 	{
-		file << "," << res->data->at(i) << "\n";
+		file << "," << res->data.at(i) << "\n";
 	} // end for
 
 	file << "\n";
@@ -162,18 +162,7 @@ void Test::writeResultsToFile(results_t* res)
 {
 	ofstream file("results.csv", ios::out | ios::app);
 
-	file << "Time for run:," << res->d_avgTime << "\n";
-	file << "Solution found:, " << res->d_bestValue << "\n";
-	
-	if (res->bestValues != nullptr)
-	{
-		file << "Solution vector:,";
-
-		for (size_t i = 0; i < res->bestValues->size(); i++)
-		{
-			file << res->bestValues->at(i) << ",";
-		} // end for
-	} // end if
+	file << *res;
 
 	file.close();
 } // end method 
@@ -191,27 +180,29 @@ string Test::makeFileName(size_t ui_dim, int i_functionNumber)
 /* -------------------------- End of Class Test -------------------------- */
 
 // definition of results_t::operator<<
-// this is just here to avoid having an extra file to compile
+// this is just here to avoid having an extra file to compile (this cannot be defined inside the class as it's a friend)
 std::ostream& operator<<(ostream& stream, results_t& res)
 {
-	if (res.bestValues != nullptr)
+	if (res.bestValues.size() > 0)
 	{
-		stream << "Dimensions: " << res.bestValues->size() << "\n";
+		stream << "Dimensions: " << res.bestValues.size() << "\n";
 	} // end if
 
 	stream << "Optimal solution found: " << res.d_bestValue << "\n";
 
 	stream << "Time to compute: " << res.d_avgTime << "\n";
 
-	if (res.bestValues != nullptr)
+	stream << "Function calls made: " << res.ui_functionCalls << "\n";
+
+	if (res.bestValues.size() > 0)
 	{
 		stream << "Optimal point: [ ";
 
-		for (size_t i = 0; i < res.bestValues->size(); i++)
+		for (size_t i = 0; i < res.bestValues.size(); i++)
 		{
-			stream << res.bestValues->at(i);
+			stream << res.bestValues.at(i);
 
-			if ((i + 1) < res.bestValues->size())
+			if ((i + 1) < res.bestValues.size())
 			{
 				stream << ", ";
 			} // end if
