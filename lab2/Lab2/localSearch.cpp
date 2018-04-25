@@ -1,8 +1,6 @@
 #include "localSearch.hpp"
 #include <limits>
 
-#define PRECISION 0.001
-
 using namespace std;
 
 results_t* localSearch(costFunction f, const std::size_t ui_SIZE, double d_min, double d_max, double d_DELTA_X, bool b_storeData)

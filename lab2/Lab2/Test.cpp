@@ -149,7 +149,7 @@ void Test::dumpDataToFile(string s_name, results_t* res)
 
 	for (size_t i = 0; i < res->data.size(); i++)
 	{
-		file << "," << res->data.at(i) << "\n";
+		file << res->data.at(i) << "\n";
 	} // end for
 
 	file << "\n";
@@ -193,6 +193,8 @@ std::ostream& operator<<(ostream& stream, results_t& res)
 	stream << "Time to compute: " << res.d_avgTime << "\n";
 
 	stream << "Function calls made: " << res.ui_functionCalls << "\n";
+
+	stream << "Final delta x value: " << res.d_finalDeltaX << "\n";
 
 	if (res.bestValues.size() > 0)
 	{

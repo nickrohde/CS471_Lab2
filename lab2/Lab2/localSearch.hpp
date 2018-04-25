@@ -6,6 +6,8 @@
 #include "utility.hpp"
 #include <functional>
 
+#define PRECISION 0.001
+
 /// <summary>Typedef to make cost function type a bit more readable.</summary>
 typedef std::function<double(const std::vector<double>*)> costFunction;
 

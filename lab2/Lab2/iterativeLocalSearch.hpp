@@ -4,7 +4,12 @@
 #define _ILS_H
 #include "results.hpp"
 #include "utility.hpp"
+#include "localSearch.hpp"
 #include <functional>
+
+/// <summary>The change that is applied to the delta x value at each iteration.</summary>
+#define DELTA_X_CHANGE_START_VALUE (PRECISION * 50)
+#define DELTA_X_CHANGE_VALUE (PRECISION * 5)
 
 /// <summary>Typedef to make cost function type a bit more readable.</summary>
 typedef std::function<double(const std::vector<double>*)> costFunction;

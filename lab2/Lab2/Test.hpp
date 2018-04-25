@@ -73,6 +73,8 @@ public:
 					time_to_compute = std::chrono::duration_cast<duration>(compute_end - compute_start);
 
 					temp->d_avgTime += time_to_compute.count();
+					temp->d_finalDeltaX += temp2->d_finalDeltaX;
+					temp->ui_functionCalls += temp2->ui_functionCalls;
 
 					if (b_storeData)
 					{
@@ -82,7 +84,9 @@ public:
 					delete temp2;
 				} // end for j
 
-				temp->d_avgTime = temp->d_avgTime /static_cast<double>(ui_iterations); // calculate avg time
+				temp->d_avgTime /= static_cast<double>(ui_iterations); // calculate avg time
+				temp->d_finalDeltaX /= static_cast<double>(ui_iterations); // calculate avg deltaX found
+				temp->ui_functionCalls /= static_cast<double>(ui_iterations); // calculate avg function calls
 
 				writeResultsToFile(temp); // write best point and average time to file
 

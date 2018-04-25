@@ -15,7 +15,8 @@ public:
 	/// <summary>Default Constructor.</summary>
 	results_t(void)
 	{
-		d_avgTime = d_bestValue = std::numeric_limits<double>::max();
+		d_bestValue = std::numeric_limits<double>::max();
+		d_finalDeltaX = d_avgTime = 0;
 		ui_functionCalls = 0;
 	} // end Constructor
 
@@ -38,7 +39,9 @@ public:
 	double	d_avgTime,
 
 	/// <summary>Best value found during test.</summary>
-			d_bestValue;
+			d_bestValue,
+	/// <summary>The final value of the delta x parameter. This is only used by ILS</summary>
+			d_finalDeltaX;
 
 	/// <summary>Stores # of function calls made.</summary>
 	std::size_t ui_functionCalls;
